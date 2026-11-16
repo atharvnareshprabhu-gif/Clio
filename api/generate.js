@@ -283,9 +283,9 @@ export default async function handler(req, res) {
               maxOutputTokens: 1200,
               responseMimeType: "application/json",
               responseSchema: {
-                type: "ARRAY",
+                type: "array",
                 items: {
-                  type: "STRING"
+                  type: "string"
                 }
               }
             }
