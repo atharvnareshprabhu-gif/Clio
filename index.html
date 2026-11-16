@@ -1,386 +1,1205 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VibeHook AI — Viral Hook & Bio Generator</title>
+  <meta name="theme-color" content="#07070f" />
+  <title>Clio — Hook & Bio Studio</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
-    body {
-      background-color: #07070f;
-      background-image: 
-        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.12), transparent 35%),
-        radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.14), transparent 40%);
-      color: #f3f4f6;
-      height: 100dvh;
-      overflow: hidden;
+    * {
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
     }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.35); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+
+    html {
+      min-height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      background-color: #07070f;
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(56,189,248,.12), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(168,85,247,.14), transparent 40%);
+      color: #f3f4f6;
+      overflow-x: hidden;
+    }
+
+    button, select, input, textarea {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::selection {
+      background: rgba(168,85,247,.4);
+      color: white;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(168,85,247,.35);
+      border-radius: 10px;
+    }
 
     .glass-panel {
-      background: rgba(15, 16, 28, 0.78);
+      background: rgba(15,16,28,.82);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(192, 132, 252, 0.16);
-      box-shadow: 0 0 30px rgba(88, 28, 135, 0.12);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(192,132,252,.16);
+      box-shadow: 0 0 30px rgba(88,28,135,.12);
     }
+
     .neon-glow-btn {
-      background: linear-gradient(135deg, #0284c7 0%, #7e22ce 55%, #a855f7 100%);
-      box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
-      transition: all 0.2s ease;
+      background: linear-gradient(
+        135deg,
+        #0284c7 0%,
+        #7e22ce 55%,
+        #a855f7 100%
+      );
+      box-shadow: 0 0 18px rgba(168,85,247,.35);
+      transition: .2s ease;
     }
-    .neon-glow-btn:hover {
-      box-shadow: 0 0 26px rgba(56, 189, 248, 0.65);
+
+    .neon-glow-btn:hover:not(:disabled) {
+      box-shadow: 0 0 25px rgba(56,189,248,.5);
       transform: translateY(-1px);
     }
+
+    .neon-glow-btn:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+
     .pill-active {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(168, 85, 247, 0.28));
+      background: linear-gradient(
+        135deg,
+        rgba(56,189,248,.22),
+        rgba(168,85,247,.28)
+      ) !important;
       border-color: #c084fc !important;
-      color: #ffffff !important;
-      box-shadow: 0 0 12px rgba(192, 132, 252, 0.25);
+      color: white !important;
+      box-shadow: 0 0 12px rgba(192,132,252,.2);
+    }
+
+    .field {
+      width: 100%;
+      background: rgba(2,6,23,.85);
+      border: 1px solid rgba(168,85,247,.25);
+      border-radius: 10px;
+      color: #f1f5f9;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .field:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56,189,248,.1);
+    }
+
+    .field::placeholder {
+      color: #64748b;
+    }
+
+    .field option {
+      background: #0f172a;
+      color: white;
+    }
+
+    .lang-btn {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .result-card {
+      background: rgba(2,6,23,.8);
+      border: 1px solid rgba(168,85,247,.2);
+      transition: border-color .2s, background .2s;
+      overflow-wrap: anywhere;
+    }
+
+    .result-card:hover {
+      background: rgba(15,23,42,.9);
+      border-color: rgba(56,189,248,.5);
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .toast-visible {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+    }
+
+    @media (max-width: 640px) {
+      .glass-panel {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .main-workspace {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .control-panel {
+        min-height: auto;
+      }
+
+      .output-panel {
+        min-height: 350px;
+      }
+
+      .results-area {
+        min-height: 230px;
+        max-height: 65vh;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .brand-name {
+        font-size: 12px;
+      }
+
+      .mode-btn {
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 10px;
+      }
+
+      .lang-btn {
+        font-size: 10px;
+        padding-left: 4px;
+        padding-right: 4px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
+
+    /* CLIO visual identity */
+    body {
+      background-color: #080817;
+      background-image:
+        radial-gradient(ellipse at 8% 8%, rgba(14, 165, 233, .24), transparent 34%),
+        radial-gradient(ellipse at 92% 12%, rgba(168, 85, 247, .25), transparent 36%),
+        radial-gradient(ellipse at 78% 92%, rgba(217, 70, 239, .16), transparent 34%),
+        linear-gradient(135deg, #080817 0%, #10102a 48%, #090b1b 100%);
+      background-attachment: fixed;
+    }
+
+    .glass-panel {
+      background: linear-gradient(145deg, rgba(23, 24, 48, .90), rgba(13, 15, 32, .88));
+      border: 1px solid rgba(167, 139, 250, .25);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.045);
+    }
+
+    .neon-glow-btn {
+      background: linear-gradient(105deg, #06b6d4 0%, #6366f1 48%, #c026d3 100%);
+      box-shadow: 0 8px 26px rgba(124, 58, 237, .28), 0 0 24px rgba(34, 211, 238, .12);
+    }
+
+    .neon-glow-btn:hover:not(:disabled) {
+      box-shadow: 0 10px 32px rgba(168, 85, 247, .38), 0 0 28px rgba(34, 211, 238, .22);
+    }
+
+    .pill-active {
+      background: linear-gradient(120deg, rgba(6,182,212,.24), rgba(139,92,246,.32), rgba(217,70,239,.22)) !important;
+      border-color: rgba(196,181,253,.82) !important;
+      box-shadow: 0 0 18px rgba(139,92,246,.18);
+    }
+
+    .mobile-view-toggle {
+      display: none;
+    }
+
+    .mobile-view-btn {
+      border: 1px solid rgba(167,139,250,.2);
+      color: #a5b4fc;
+      background: rgba(15,23,42,.72);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+
+    .mobile-view-btn.active {
+      color: white;
+      border-color: rgba(192,132,252,.65);
+      background: linear-gradient(110deg, rgba(6,182,212,.22), rgba(139,92,246,.32), rgba(217,70,239,.2));
+      box-shadow: 0 0 16px rgba(139,92,246,.16);
+    }
+
+    .error-state {
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      border: 1px solid rgba(248,113,113,.22);
+      border-radius: 16px;
+      background: rgba(127,29,29,.08);
+    }
+
+    .error-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fecaca;
+      font-weight: 800;
+      background: rgba(239,68,68,.16);
+      border: 1px solid rgba(248,113,113,.35);
+      margin-bottom: 12px;
+    }
+
+    .error-state h3 {
+      color: #fee2e2;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .error-state p {
+      color: #fca5a5;
+      font-size: 11px;
+      margin-top: 7px;
+      max-width: 300px;
+    }
+
+    .retry-btn {
+      margin-top: 14px;
+      padding: 9px 15px;
+      border-radius: 9px;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      background: linear-gradient(105deg,#0891b2,#7c3aed,#c026d3);
+    }
+
+    @media (min-width: 641px) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .app-shell {
+        height: calc(100dvh - 32px);
+      }
+
+      .main-workspace {
+        min-height: 0;
+      }
+
+      .control-panel, .output-panel {
+        min-height: 0;
+      }
+
+      .control-panel {
+        overflow: auto;
+      }
+
+      .output-panel {
+        overflow: hidden;
+      }
+
+      .results-area {
+        max-height: none;
+      }
+
+      footer {
+        padding-top: 8px !important;
+        padding-bottom: 4px !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        padding: 8px !important;
+      }
+
+      .app-shell {
+        height: calc(100dvh - 16px);
+        min-height: 0 !important;
+        gap: 8px;
+      }
+
+      header {
+        margin-bottom: 0 !important;
+        padding: 9px 11px !important;
+      }
+
+      header .w-9 {
+        width: 34px;
+        height: 34px;
+      }
+
+      header .flex-wrap {
+        flex-wrap: nowrap;
+      }
+
+      header .mode-btn {
+        padding: 7px 10px;
+        font-size: 10px;
+      }
+
+      .mobile-view-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 4px;
+        border: 1px solid rgba(167,139,250,.16);
+        background: rgba(8,10,25,.68);
+        border-radius: 13px;
+        flex: 0 0 auto;
+      }
+
+      .main-workspace {
+        display: block !important;
+        flex: 1 1 auto;
+        min-height: 0 !important;
+        overflow: hidden;
+      }
+
+      .control-panel, .output-panel {
+        height: 100%;
+        min-height: 0 !important;
+        padding: 13px !important;
+        overflow: auto;
+      }
+
+      .output-panel {
+        display: none;
+      }
+
+      .main-workspace.show-results .control-panel {
+        display: none;
+      }
+
+      .main-workspace.show-results .output-panel {
+        display: flex;
+      }
+
+      .compact-form {
+        gap: 10px !important;
+      }
+
+      .control-panel h2 {
+        font-size: 13px !important;
+      }
+
+      .control-panel .text-\\[11px\\] {
+        font-size: 10px !important;
+      }
+
+      .control-panel .field {
+        padding-top: 9px !important;
+        padding-bottom: 9px !important;
+      }
+
+      #topic-input {
+        min-height: 68px !important;
+        max-height: 88px !important;
+        resize: none;
+      }
+
+      .generate-area {
+        margin-top: 10px !important;
+        padding-top: 10px !important;
+      }
+
+      #generate-btn {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+      }
+
+      .output-panel .results-area {
+        min-height: 0 !important;
+        max-height: none !important;
+      }
+
+      .output-panel .result-card {
+        padding: 11px !important;
+      }
+
+      .output-panel .result-card p {
+        font-size: 11px !important;
+      }
+
+      footer {
+        display: none;
+      }
+    }
+
+    @media (max-height: 700px) and (max-width: 640px) {
+      .control-panel {
+        padding: 10px !important;
+      }
+
+      .compact-form {
+        gap: 7px !important;
+      }
+
+      #topic-input {
+        min-height: 54px !important;
+        max-height: 64px !important;
+      }
+
+      .control-panel .field {
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+      }
+
+      .generate-area {
+        margin-top: 7px !important;
+        padding-top: 7px !important;
+      }
     }
   </style>
 </head>
-<body class="flex flex-col p-3 md:p-4 select-none">
 
-  <!-- Top Compact Navbar -->
-  <header class="flex items-center justify-between px-4 py-2.5 mb-3 rounded-xl glass-panel shrink-0">
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-400 via-purple-500 to-fuchsia-400 flex items-center justify-center font-bold text-slate-950 text-sm shadow-lg shadow-purple-500/30">
-        ⚡
+<body class="p-3 sm:p-4">
+
+  <div class="app-shell max-w-[1500px] mx-auto min-h-[calc(100dvh-24px)] sm:min-h-[calc(100dvh-32px)] flex flex-col">
+
+    <!-- NAVBAR -->
+    <header class="glass-panel rounded-2xl px-3 sm:px-5 py-3 mb-4 shrink-0">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+
+        <!-- BRAND -->
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-tr from-sky-400 via-purple-500 to-fuchsia-400 flex items-center justify-center text-slate-950 text-lg shadow-lg shadow-purple-500/30">
+            ⚡
+          </div>
+
+          <div class="min-w-0">
+            <h1 class="brand-name text-base sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-sky-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">
+              Clio
+            </h1>
+            <p class="text-[9px] sm:text-[10px] text-slate-400">
+              Create. Connect. Capture Attention.
+            </p>
+          </div>
+        </div>
+
+        <!-- MODE SWITCHER -->
+        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-purple-500/20 shrink-0">
+
+          <button
+            type="button"
+            id="tab-hook"
+            onclick="switchMode('hook')"
+            aria-pressed="true"
+            class="mode-btn pill-active border border-transparent px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition-all">
+            🪝 Hooks
+          </button>
+
+          <button
+            type="button"
+            id="tab-bio"
+            onclick="switchMode('bio')"
+            aria-pressed="false"
+            class="mode-btn border border-transparent px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+            ✨ Bios
+          </button>
+
+        </div>
       </div>
-      <div>
-        <h1 class="text-sm md:text-base font-bold tracking-tight bg-gradient-to-r from-sky-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">
-          VibeHook AI
-        </h1>
-        <p class="text-[10px] text-slate-400 hidden sm:block">Scroll-Stopping Hooks & High-Converting Bios</p>
-      </div>
+    </header>
+
+    <!-- MOBILE WORKSPACE SWITCHER -->
+    <div class="mobile-view-toggle" role="group" aria-label="Workspace view">
+      <button type="button" id="mobile-create-tab" class="mobile-view-btn active" onclick="setMobileView('create')">Create</button>
+      <button type="button" id="mobile-results-tab" class="mobile-view-btn" onclick="setMobileView('results')">Results</button>
     </div>
 
-    <!-- Mode Switcher (Center) -->
-    <div class="flex bg-slate-950/80 p-1 rounded-lg border border-purple-500/20">
-      <button id="tab-hook" onclick="switchMode('hook')" class="px-3 py-1 rounded-md text-xs font-semibold transition-all pill-active border border-transparent">
-        🪝 Viral Hooks
-      </button>
-      <button id="tab-bio" onclick="switchMode('bio')" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition-all border border-transparent">
-        ✨ Bio Generator
-      </button>
-    </div>
+    <!-- MAIN WORKSPACE -->
+    <main class="main-workspace grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
 
-    <div class="w-8"></div>
-  </header>
+      <!-- LEFT CONTROL PANEL -->
+      <section id="control-panel" class="control-panel lg:col-span-5 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between min-w-0">
 
-  <!-- Main Single-View Workspace (Zero Scroll) -->
-  <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
+        <div class="space-y-3 compact-form">
 
-    <!-- LEFT PANEL: Controls -->
-    <section class="lg:col-span-5 glass-panel rounded-xl p-4 flex flex-col justify-between overflow-y-auto">
-      <div class="space-y-3">
-        
-        <!-- Platform & Tone Row -->
-        <div class="grid grid-cols-2 gap-2.5">
+          <!-- PANEL HEADING -->
           <div>
-            <label class="block text-[11px] font-medium text-purple-300 mb-1">Platform</label>
-            <select id="platform-select" class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
-              <!-- Populated dynamically -->
-            </select>
+            <h2 class="text-sm font-bold text-white">Create your content</h2>
+            <p class="text-[11px] text-slate-400 mt-1">
+              Customize your output in a few simple steps.
+            </p>
           </div>
+
+          <!-- PLATFORM & TONE -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+            <div class="min-w-0">
+              <label for="platform-select" class="block text-[11px] font-semibold text-purple-300 mb-2">
+                Platform
+              </label>
+
+              <select
+                id="platform-select"
+                class="field px-3 py-2.5 text-xs cursor-pointer">
+              </select>
+            </div>
+
+            <div class="min-w-0">
+              <label for="tone-select" class="block text-[11px] font-semibold text-purple-300 mb-2">
+                Vibe / Tone
+              </label>
+
+              <select
+                id="tone-select"
+                class="field px-3 py-2.5 text-xs cursor-pointer">
+
+                <option value="Curiosity & Scroll-Stopping">🔥 Curiosity Gap</option>
+                <option value="Bold & Controversial">⚡ Bold / Unpopular Opinion</option>
+                <option value="Witty & Relatable">😎 Witty & Relatable</option>
+                <option value="Storytelling & Emotional">🎬 Storytelling</option>
+                <option value="Direct Value & Actionable">🎯 Direct Value</option>
+
+              </select>
+            </div>
+          </div>
+
+          <!-- LANGUAGE SELECTOR -->
           <div>
-            <label class="block text-[11px] font-medium text-purple-300 mb-1">Vibe / Tone</label>
-            <select id="tone-select" class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
-              <option value="Curiosity & Scroll-Stopping">🔥 Curiosity Gap</option>
-              <option value="Bold & Controversial">⚡ Bold / Unpopular Opinion</option>
-              <option value="Witty & Relatable">😎 Witty & Relatable</option>
-              <option value="Storytelling & Emotional">🎬 Storytelling</option>
-              <option value="Direct Value & Actionable">🎯 Direct Value</option>
-            </select>
+            <label class="block text-[11px] font-semibold text-purple-300 mb-2">
+              Language Style
+            </label>
+
+            <div class="grid grid-cols-3 gap-2" id="lang-group">
+
+              <button
+                type="button"
+                onclick="selectLang('Hinglish', this)"
+                aria-pressed="true"
+                class="lang-btn pill-active py-2 px-2 rounded-lg text-[11px] font-medium border border-purple-500/20 text-slate-300 transition">
+                🇮🇳 Hinglish
+              </button>
+
+              <button
+                type="button"
+                onclick="selectLang('Simple English', this)"
+                aria-pressed="false"
+                class="lang-btn py-2 px-2 rounded-lg text-[11px] font-medium bg-slate-950/70 border border-purple-500/20 text-slate-300 hover:border-purple-400/50 transition">
+                💬 Simple Eng
+              </button>
+
+              <button
+                type="button"
+                onclick="selectLang('Professional English', this)"
+                aria-pressed="false"
+                class="lang-btn py-2 px-2 rounded-lg text-[11px] font-medium bg-slate-950/70 border border-purple-500/20 text-slate-300 hover:border-purple-400/50 transition">
+                💼 Pro Eng
+              </button>
+
+            </div>
           </div>
-        </div>
 
-        <!-- Language Style Selector (Pills) -->
-        <div>
-          <label class="block text-[11px] font-medium text-purple-300 mb-1">Language Style</label>
-          <div class="grid grid-cols-3 gap-2" id="lang-group">
-            <button type="button" onclick="selectLang('Hinglish', this)" class="lang-btn pill-active py-1.5 px-2 rounded-lg text-[11px] font-medium border border-purple-500/20 text-slate-300 transition text-center">
-              🇮🇳 Hinglish
-            </button>
-            <button type="button" onclick="selectLang('Simple English', this)" class="lang-btn py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-950/70 border border-purple-500/20 text-slate-300 hover:border-purple-400/50 transition text-center">
-              💬 Simple Eng
-            </button>
-            <button type="button" onclick="selectLang('Professional English', this)" class="lang-btn py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-950/70 border border-purple-500/20 text-slate-300 hover:border-purple-400/50 transition text-center">
-              💼 Pro English
-            </button>
+          <!-- TOPIC INPUT -->
+          <div>
+            <div class="flex justify-between items-center mb-2 gap-2">
+              <label id="input-label" for="topic-input" class="text-[11px] font-semibold text-purple-300">
+                Video / Post Topic
+              </label>
+
+              <span class="text-[9px] text-slate-500">
+                Required
+              </span>
+            </div>
+
+            <textarea
+              id="topic-input"
+              rows="3"
+              maxlength="2000"
+              placeholder="e.g. How students can earn money using AI tools without coding..."
+              class="field p-3 text-xs leading-relaxed resize-y min-h-[72px] max-h-[110px]"></textarea>
+
+            <div class="flex justify-end mt-1">
+              <span id="topic-counter" class="text-[9px] text-slate-500">0 / 2000</span>
+            </div>
           </div>
+
+          <!-- EXTRA INPUT -->
+          <div>
+            <label id="extra-label" for="extra-input" class="block text-[11px] font-semibold text-purple-300 mb-2">
+              Target Audience / Keywords (Optional)
+            </label>
+
+            <input
+              id="extra-input"
+              type="text"
+              maxlength="300"
+              placeholder="e.g. College students, beginners, zero investment"
+              class="field px-3 py-3 text-xs" />
+          </div>
+
         </div>
 
-        <!-- Topic / Niche Input -->
-        <div>
-          <label id="input-label" class="block text-[11px] font-medium text-purple-300 mb-1">Video / Post Topic</label>
-          <textarea id="topic-input" rows="3" placeholder="e.g., How students can earn money using AI tools without coding..."
-            class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400 resize-none"></textarea>
-        </div>
+        <!-- GENERATE BUTTON -->
+        <div class="pt-3 mt-3 border-t border-purple-500/15 generate-area">
 
-        <!-- Extra Context / Keywords -->
-        <div>
-          <label id="extra-label" class="block text-[11px] font-medium text-purple-300 mb-1">Target Audience / Keywords (Optional)</label>
-          <input id="extra-input" type="text" placeholder="e.g., College students, beginners, zero investment"
-            class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg px-2.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400" />
-        </div>
+          <button
+            id="generate-btn"
+            type="button"
+            onclick="generateContent()"
+            class="neon-glow-btn w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm text-white flex items-center justify-center gap-2 cursor-pointer">
 
-      </div>
+            <span>✨ Generate 3 Options</span>
 
-      <!-- Generate CTA -->
-      <div class="pt-3 mt-2 border-t border-purple-500/15">
-        <button id="generate-btn" onclick="generateContent()" class="w-full neon-glow-btn py-2.5 rounded-xl font-semibold text-xs md:text-sm text-white flex items-center justify-center gap-2 cursor-pointer">
-          <span>✨ Generate 3 Viral Options</span>
-        </button>
-      </div>
-    </section>
+          </button>
 
-    <!-- RIGHT PANEL: Output Feed -->
-    <section class="lg:col-span-7 glass-panel rounded-xl p-4 flex flex-col min-h-0">
-      <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-purple-500/15 shrink-0">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-          <h2 id="output-title" class="text-xs md:text-sm font-semibold text-slate-200">Generated Results</h2>
-        </div>
-        <button onclick="copyAll()" id="copy-all-btn" class="hidden text-[11px] px-2.5 py-1 rounded-md bg-sky-500/15 text-sky-300 border border-sky-400/30 hover:bg-sky-500/25 transition">
-          Copy All
-        </button>
-      </div>
-
-      <!-- Scrollable Results Container -->
-      <div id="results-container" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
-        <div class="h-full flex flex-col items-center justify-center text-center px-6 opacity-60">
-          <p class="text-xs text-slate-400">
-            Topic likho aur <span class="text-sky-300 font-semibold">Generate</span> dabao! ✨
+          <p class="text-center text-[9px] text-slate-500 mt-2">
+            Make your next post worth stopping for.
           </p>
+
         </div>
-      </div>
-    </section>
 
-  </main>
+      </section>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 border border-sky-400/50 text-sky-200 px-3.5 py-2 rounded-lg text-xs font-medium shadow-lg shadow-sky-500/20 translate-y-16 opacity-0 transition-all duration-300 pointer-events-none z-50">
-    ✅ Copied to clipboard!
+      <!-- RIGHT OUTPUT PANEL -->
+      <section id="output-panel" class="output-panel lg:col-span-7 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col min-w-0 min-h-0">
+
+        <!-- OUTPUT HEADER -->
+        <div class="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-purple-500/15 shrink-0">
+
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse shrink-0"></span>
+
+            <div class="min-w-0">
+              <h2 id="output-title" class="text-sm font-bold text-slate-200">
+                Generated Viral Hooks
+              </h2>
+
+              <p class="text-[9px] text-slate-500 mt-0.5">
+                Your generated content appears here.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onclick="copyAll()"
+            id="copy-all-btn"
+            class="hidden shrink-0 text-[10px] sm:text-[11px] px-3 py-2 rounded-lg bg-sky-500/10 text-sky-300 border border-sky-400/30 hover:bg-sky-500/20 transition">
+            📋 Copy All
+          </button>
+
+        </div>
+
+        <!-- RESULTS -->
+        <div
+          id="results-container"
+          aria-live="polite"
+          aria-busy="false"
+          class="results-area flex-1 min-h-[240px] overflow-y-auto space-y-3 pr-1">
+
+          <!-- INITIAL EMPTY STATE -->
+          <div class="min-h-[250px] flex flex-col items-center justify-center text-center px-4">
+
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500/15 to-purple-500/20 border border-purple-400/20 flex items-center justify-center text-2xl mb-4">
+              ✨
+            </div>
+
+            <h3 class="text-sm font-semibold text-slate-200">
+              Ready to create?
+            </h3>
+
+            <p class="text-[11px] text-slate-400 mt-2 max-w-[260px] leading-relaxed">
+              Enter your topic, choose your preferences and generate your first set of content.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4 mt-3 shrink-0">
+      <p class="text-[9px] text-slate-500">
+        © 2026 Clio · Create content that connects.
+      </p>
+    </footer>
+
   </div>
 
-  <script>
-    let currentMode = 'hook';
-    let selectedLang = 'Hinglish';
-    let generatedItems = [];
+  <!-- TOAST -->
+  <div
+    id="toast"
+    role="status"
+    aria-live="polite"
+    class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-16 opacity-0 transition-all duration-300 pointer-events-none z-50 bg-slate-900 border border-sky-400/40 text-sky-200 px-4 py-3 rounded-xl text-xs font-medium shadow-xl max-w-[90vw] text-center">
+    Notification
+  </div>
 
-    const platforms = {
-      hook: [
-        { value: 'Instagram Reels / YouTube Shorts', label: '📱 Reels / YT Shorts' },
-        { value: 'LinkedIn Post', label: '💼 LinkedIn Post' },
-        { value: 'Twitter / X Thread', label: '🐦 X (Twitter) Thread' },
-        { value: 'YouTube Long Video', label: '▶️ YouTube Intro' },
-        { value: 'WhatsApp / Cold Outreach', label: '💬 WhatsApp Hook' }
-      ],
-      bio: [
-        { value: 'Instagram Bio', label: '📸 Instagram Bio' },
-        { value: 'LinkedIn Headline & Short Bio', label: '💼 LinkedIn Headline' },
-        { value: 'Twitter / X Bio', label: '🐦 X (Twitter) Bio' },
-        { value: 'Bumble / Dating Profile Bio', label: '✨ Dating App Bio' },
-        { value: 'Portfolio / Freelancer Bio', label: '💻 Creator / Dev Bio' }
-      ]
-    };
+<script>
+  let currentMode = 'hook';
+  let selectedLang = 'Hinglish';
+  let generatedItems = [];
+  let toastTimer = null;
 
-    window.onload = () => {
-      updatePlatformDropdown();
-    };
+  const platforms = {
+    hook: [
+      { value: 'Instagram Reels/YouTube Shorts', label: '📱 Reels / YT Shorts' },
+      { value: 'LinkedIn Post', label: '💼 LinkedIn Post' },
+      { value: 'Twitter/X Thread', label: '🐦 X (Twitter) Thread' },
+      { value: 'YouTube Long Video', label: '▶️ YouTube Intro' },
+      { value: 'WhatsApp/Cold Outreach', label: '💬 WhatsApp Hook' }
+    ],
 
-    function switchMode(mode) {
-      currentMode = mode;
-      const tabHook = document.getElementById('tab-hook');
-      const tabBio = document.getElementById('tab-bio');
-      const inputLabel = document.getElementById('input-label');
-      const extraLabel = document.getElementById('extra-label');
-      const topicInput = document.getElementById('topic-input');
-      const extraInput = document.getElementById('extra-input');
-      const outputTitle = document.getElementById('output-title');
+    bio: [
+      { value: 'Instagram Bio', label: '📸 Instagram Bio' },
+      { value: 'LinkedIn Headline & Short Bio', label: '💼 LinkedIn Headline' },
+      { value: 'Twitter/X Bio', label: '🐦 X (Twitter) Bio' },
+      { value: 'Bumble/Dating Profile Bio', label: '✨ Dating App Bio' },
+      { value: 'Portfolio/Freelancer Bio', label: '💻 Creator / Dev Bio' }
+    ]
+  };
 
-      if (mode === 'hook') {
-        tabHook.classList.add('pill-active');
-        tabHook.classList.remove('text-slate-400');
-        tabBio.classList.remove('pill-active');
-        tabBio.classList.add('text-slate-400');
+  // Mobile workspace tabs
+  function setMobileView(view) {
+    const workspace = document.querySelector('.main-workspace');
+    const createTab = document.getElementById('mobile-create-tab');
+    const resultsTab = document.getElementById('mobile-results-tab');
+    const showResults = view === 'results';
 
-        inputLabel.innerText = 'Video / Post Topic';
-        topicInput.placeholder = 'e.g., How students can earn money using AI tools without coding...';
-        extraLabel.innerText = 'Target Audience / Keywords (Optional)';
-        extraInput.placeholder = 'e.g., College students, beginners, Mumbai';
-        outputTitle.innerText = 'Generated Viral Hooks';
-      } else {
-        tabBio.classList.add('pill-active');
-        tabBio.classList.remove('text-slate-400');
-        tabHook.classList.remove('pill-active');
-        tabHook.classList.add('text-slate-400');
+    workspace.classList.toggle('show-results', showResults);
+    createTab.classList.toggle('active', !showResults);
+    resultsTab.classList.toggle('active', showResults);
+    createTab.setAttribute('aria-pressed', String(!showResults));
+    resultsTab.setAttribute('aria-pressed', String(showResults));
+  }
 
-        inputLabel.innerText = 'About You / Niche / Skills';
-        topicInput.placeholder = 'e.g., 21yo web developer & indie game builder from Mumbai, love coffee and storytelling...';
-        extraLabel.innerText = 'Call to Action / Achievement (Optional)';
-        extraInput.placeholder = 'e.g., Built 5 AI tools, DM for collabs';
-        outputTitle.innerText = 'Generated Profile Bios';
-      }
-      updatePlatformDropdown();
+  // INITIALIZATION
+  document.addEventListener('DOMContentLoaded', () => {
+    updatePlatformDropdown();
+
+    const topicInput = document.getElementById('topic-input');
+
+    topicInput.addEventListener('input', () => {
+      document.getElementById('topic-counter').textContent =
+        `${topicInput.value.length} / 2000`;
+    });
+  });
+
+  // MODE SWITCHER
+  function switchMode(mode) {
+    if (mode !== 'hook' && mode !== 'bio') return;
+
+    currentMode = mode;
+
+    const tabHook = document.getElementById('tab-hook');
+    const tabBio = document.getElementById('tab-bio');
+
+    const inputLabel = document.getElementById('input-label');
+    const extraLabel = document.getElementById('extra-label');
+
+    const topicInput = document.getElementById('topic-input');
+    const extraInput = document.getElementById('extra-input');
+
+    const outputTitle = document.getElementById('output-title');
+
+    tabHook.classList.toggle('pill-active', mode === 'hook');
+    tabBio.classList.toggle('pill-active', mode === 'bio');
+
+    tabHook.classList.toggle('text-slate-400', mode !== 'hook');
+    tabBio.classList.toggle('text-slate-400', mode !== 'bio');
+
+    tabHook.setAttribute('aria-pressed', mode === 'hook');
+    tabBio.setAttribute('aria-pressed', mode === 'bio');
+
+    if (mode === 'hook') {
+      inputLabel.textContent = 'Video / Post Topic';
+
+      topicInput.placeholder =
+        'e.g. How students can earn money using AI tools without coding...';
+
+      extraLabel.textContent =
+        'Target Audience / Keywords (Optional)';
+
+      extraInput.placeholder =
+        'e.g. College students, beginners, Mumbai';
+
+      outputTitle.textContent = 'Generated Viral Hooks';
+
+    } else {
+      inputLabel.textContent = 'About You / Niche / Skills';
+
+      topicInput.placeholder =
+        'e.g. Web developer, AI enthusiast, content creator...';
+
+      extraLabel.textContent =
+        'Call to Action / Achievement (Optional)';
+
+      extraInput.placeholder =
+        'e.g. Built 5 AI tools, DM for collaborations';
+
+      outputTitle.textContent = 'Generated Profile Bios';
     }
 
-    function updatePlatformDropdown() {
-      const select = document.getElementById('platform-select');
-      select.innerHTML = platforms[currentMode]
-        .map(p => `<option value="${p.value}">${p.label}</option>`)
-        .join('');
+    // Clear old results when switching modes
+    generatedItems = [];
+
+    document.getElementById('copy-all-btn').classList.add('hidden');
+
+    document.getElementById('results-container').innerHTML = `
+      <div class="min-h-[250px] flex flex-col items-center justify-center text-center px-4">
+        <div class="text-3xl mb-3">✨</div>
+        <h3 class="text-sm font-semibold text-slate-200">
+          Ready to create?
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-2">
+          Enter your details and generate your content.
+        </p>
+      </div>
+    `;
+
+    updatePlatformDropdown();
+    updateGenerateButton();
+
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      setMobileView('create');
+    }
+  }
+
+  // PLATFORM DROPDOWN
+  function updatePlatformDropdown() {
+    const select = document.getElementById('platform-select');
+
+    select.innerHTML = platforms[currentMode]
+      .map(platform =>
+        `<option value="${escapeHtml(platform.value)}">${escapeHtml(platform.label)}</option>`
+      )
+      .join('');
+  }
+
+  // LANGUAGE SELECTOR
+  function selectLang(lang, btn) {
+    selectedLang = lang;
+
+    document.querySelectorAll('.lang-btn').forEach(button => {
+      button.classList.remove('pill-active');
+      button.classList.add('bg-slate-950/70');
+      button.setAttribute('aria-pressed', 'false');
+    });
+
+    btn.classList.add('pill-active');
+    btn.classList.remove('bg-slate-950/70');
+    btn.setAttribute('aria-pressed', 'true');
+  }
+
+  // BUTTON LABEL
+  function updateGenerateButton() {
+    const btn = document.getElementById('generate-btn');
+
+    btn.innerHTML = currentMode === 'hook'
+      ? '<span>✨ Generate 3 Hooks</span>'
+      : '<span>✨ Generate 3 Bios</span>';
+  }
+
+  // GENERATE CONTENT
+  async function generateContent() {
+    const topic = document.getElementById('topic-input').value.trim();
+    const extra = document.getElementById('extra-input').value.trim();
+
+    const platform = document.getElementById('platform-select').value;
+    const tone = document.getElementById('tone-select').value;
+
+    if (!topic) {
+      showToast('⚠️ Please enter your topic or niche.');
+      document.getElementById('topic-input').focus();
+      return;
     }
 
-    function selectLang(lang, btn) {
-      selectedLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => {
-        b.classList.remove('pill-active');
-        b.classList.add('bg-slate-950/70');
+    const btn = document.getElementById('generate-btn');
+    const container = document.getElementById('results-container');
+
+    btn.disabled = true;
+
+    btn.innerHTML = `
+      <span class="animate-spin">⏳</span>
+      <span>Generating...</span>
+    `;
+
+    container.setAttribute('aria-busy', 'true');
+
+    document.getElementById('copy-all-btn').classList.add('hidden');
+
+    container.innerHTML = `
+      <div class="space-y-3 animate-pulse">
+        <div class="h-28 rounded-xl bg-slate-900/90 border border-purple-500/20"></div>
+        <div class="h-28 rounded-xl bg-slate-900/90 border border-purple-500/20"></div>
+        <div class="h-28 rounded-xl bg-slate-900/90 border border-purple-500/20"></div>
+      </div>
+    `;
+
+    try {
+      // API request to Vercel backend
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          mode: currentMode,
+          topic,
+          extra,
+          platform,
+          tone,
+          language: selectedLang
+        })
       });
-      btn.classList.add('pill-active');
-      btn.classList.remove('bg-slate-950/70');
-    }
 
-    async function generateContent() {
-      const topic = document.getElementById('topic-input').value.trim();
-      const extra = document.getElementById('extra-input').value.trim();
-      const platform = document.getElementById('platform-select').value;
-      const tone = document.getElementById('tone-select').value;
+      let data;
 
-      if (!topic) {
-        showToast('⚠️ Pehle topic ya niche likho bhai!');
-        document.getElementById('topic-input').focus();
-        return;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('Invalid server response. Please try again.');
       }
 
-      const btn = document.getElementById('generate-btn');
-      const container = document.getElementById('results-container');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="animate-spin">⏳</span> Generating...`;
+      if (!response.ok) {
+        throw new Error(data.error || 'Server error');
+      }
+
+      if (!data || !Array.isArray(data.results) || data.results.length === 0) {
+        throw new Error('No valid results received from server.');
+      }
+
+      generatedItems = data.results
+        .filter(item => typeof item === 'string' && item.trim())
+        .slice(0, 3);
+
+      if (generatedItems.length === 0) {
+        throw new Error('Empty generated content.');
+      }
+
+      renderResults(generatedItems);
+
+      if (window.matchMedia('(max-width: 640px)').matches) {
+        setMobileView('results');
+      }
+
+      showToast('✨ Content generated successfully!');
+
+    } catch (err) {
+      console.error('Generation error:', err);
+
+      generatedItems = [];
+      document.getElementById('copy-all-btn').classList.add('hidden');
 
       container.innerHTML = `
-        <div class="space-y-2.5 animate-pulse">
-          ${[1,2,3].map(() => `<div class="h-16 rounded-xl bg-slate-900/90 border border-purple-500/20"></div>`).join('')}
+        <div class="error-state">
+          <div class="error-icon">!</div>
+          <h3>Generation failed</h3>
+          <p>${escapeHtml(err.message || 'Unable to generate content. Please try again.')}</p>
+          <button type="button" class="retry-btn" onclick="generateContent()">Try again</button>
         </div>
       `;
 
-      try {
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            mode: currentMode,
-            topic,
-            extra,
-            platform,
-            tone,
-            language: selectedLang
-          })
-        });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Server error');
-
-        generatedItems = data.results;
-        renderResults(data.results);
-
-      } catch (err) {
-        console.error(err);
-        showToast('❌ Error! Using backup templates.');
-        const fallback = generateDemoFallback(topic, extra);
-        generatedItems = fallback;
-        renderResults(fallback);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<span>✨ Generate 3 Viral Options</span>`;
+      if (window.matchMedia('(max-width: 640px)').matches) {
+        setMobileView('results');
       }
+
+      showToast('Generation failed. Please try again.');
+
+    } finally {
+      btn.disabled = false;
+      updateGenerateButton();
+      container.setAttribute('aria-busy', 'false');
+    }
+  }
+
+  // RENDER RESULTS
+  function renderResults(items) {
+    const container = document.getElementById('results-container');
+    const copyAllBtn = document.getElementById('copy-all-btn');
+
+    copyAllBtn.classList.remove('hidden');
+    container.innerHTML = '';
+
+    items.forEach((text, index) => {
+      const card = document.createElement('div');
+
+      card.className =
+        'result-card rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-start justify-between gap-3';
+
+      const contentWrapper = document.createElement('div');
+
+      contentWrapper.className =
+        'flex items-start gap-3 min-w-0 flex-1';
+
+      const number = document.createElement('span');
+
+      number.className =
+        'text-[10px] font-bold px-2 py-1 rounded-md bg-purple-500/20 text-purple-300 shrink-0';
+
+      number.textContent = `#${index + 1}`;
+
+      const paragraph = document.createElement('p');
+
+      paragraph.className =
+        'text-xs sm:text-[13px] text-slate-100 leading-relaxed whitespace-pre-line select-text min-w-0';
+
+      paragraph.textContent = text;
+
+      contentWrapper.appendChild(number);
+      contentWrapper.appendChild(paragraph);
+
+      const copyButton = document.createElement('button');
+
+      copyButton.type = 'button';
+
+      copyButton.className =
+        'copy-btn self-end sm:self-start px-3 py-2 rounded-lg bg-slate-900 border border-purple-400/25 hover:border-sky-400 text-[11px] font-semibold text-sky-300 hover:text-white transition';
+
+      copyButton.textContent = '📋 Copy';
+
+      copyButton.addEventListener('click', () => {
+        copySingle(index);
+      });
+
+      card.appendChild(contentWrapper);
+      card.appendChild(copyButton);
+
+      container.appendChild(card);
+    });
+  }
+
+  // CLIPBOARD FUNCTION
+  async function copyText(text) {
+    if (!text) {
+      showToast('Nothing to copy.');
+      return false;
     }
 
-    function generateDemoFallback(topic, extra) {
-      if (currentMode === 'hook') {
-        if (selectedLang === 'Hinglish') {
-          return [
-            `Bhai, agar tum abhi bhi "${topic}" purane tareeke se kar rahe ho, toh yeh 30 seconds tumhara time bacha lenge.`,
-            `99% log "${topic}" mein ek hi galti karte hain — aur unhe pata bhi nahi chalta. Dekho kaise fix karna hai 👇`,
-            `Sach bolu? "${topic}" utna mushkil nahi hai jitna logon ne bana rakha hai. Bas yeh ek rule samajh lo.`
-          ];
-        } else {
-          return [
-            `Stop scrolling if you want to get better at ${topic} in the next 60 seconds.`,
-            `I tried every trick for ${topic}, and this simple habit is the only one that actually worked.`,
-            `Nobody talks about the hardest part of ${topic}—until you try doing it yourself.`
-          ];
-        }
-      } else {
-        if (selectedLang === 'Hinglish') {
-          return [
-            `🚀 ${topic}\n💡 Sapne bade, execution usse bhi fast\n👇 ${extra || 'Naya kuch build ho raha hai!'}`,
-            `Building cool stuff around ${topic} ⚡\nChai + Code + Late night ideas ☕`,
-            `✨ ${topic}\nSeedhi baat, zero fluff. Roz kuch naya seekh raha hoon.`
-          ];
-        } else {
-          return [
-            `✨ ${topic}\nMaking simple things that actually work.\n👇 ${extra || 'Check out my latest work'}`,
-            `Hey! I focus on ${topic}.\nSharing what I learn along the way 🚀`,
-            `${topic} 🌱\nBig fan of clean design, good stories, and late-night ideas.`
-          ];
-        }
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
       }
+
+      // Fallback for browsers without Clipboard API
+      const textarea = document.createElement('textarea');
+
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.pointerEvents = 'none';
+
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      const success = document.execCommand('copy');
+      textarea.remove();
+
+      if (!success) {
+        throw new Error('Clipboard copy failed.');
+      }
+
+      return true;
+
+    } catch (err) {
+      console.error('Clipboard error:', err);
+      showToast('Unable to copy. Please select the text manually.');
+      return false;
     }
+  }
 
-    function renderResults(items) {
-      const container = document.getElementById('results-container');
-      const copyAllBtn = document.getElementById('copy-all-btn');
-      copyAllBtn.classList.remove('hidden');
+  // COPY SINGLE
+  async function copySingle(index) {
+    const success = await copyText(generatedItems[index]);
 
-      container.innerHTML = items.map((text, idx) => `
-        <div class="group relative bg-slate-950/85 hover:bg-slate-900/95 border border-purple-500/20 hover:border-sky-400/50 rounded-xl p-3 transition-all duration-200 flex items-start justify-between gap-3">
-          <div class="flex items-start gap-2.5">
-            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 mt-0.5 shrink-0">
-              #${idx + 1}
-            </span>
-            <p class="text-xs md:text-[13px] text-slate-100 leading-relaxed whitespace-pre-line select-text">${escapeHtml(text)}</p>
-          </div>
-          <button onclick="copySingle(${idx})" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-purple-400/25 hover:border-sky-400 text-[11px] font-medium text-sky-300 hover:text-white transition cursor-pointer">
-            Copy
-          </button>
-        </div>
-      `).join('');
-    }
-
-    function copySingle(index) {
-      navigator.clipboard.writeText(generatedItems[index]);
+    if (success) {
       showToast(`✅ Option #${index + 1} copied!`);
     }
+  }
 
-    function copyAll() {
-      const allText = generatedItems.map((t, i) => `${i + 1}. ${t}`).join('\n\n');
-      navigator.clipboard.writeText(allText);
-      showToast('📋 All 3 options copied!');
+  // COPY ALL
+  async function copyAll() {
+    if (!generatedItems.length) {
+      showToast('No content available to copy.');
+      return;
     }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.remove('translate-y-16', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('translate-y-16', 'opacity-0');
-      }, 2200);
+    const allText = generatedItems
+      .map((text, index) => `${index + 1}. ${text}`)
+      .join('\n\n');
+
+    const success = await copyText(allText);
+
+    if (success) {
+      showToast('📋 All options copied!');
+    }
+  }
+
+  // TOAST NOTIFICATION
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+
+    toast.textContent = message;
+    toast.classList.add('toast-visible');
+
+    if (toastTimer) {
+      clearTimeout(toastTimer);
     }
 
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      })[m]);
-    }
-  </script>
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('toast-visible');
+    }, 2500);
+  }
+
+  // HTML ESCAPING
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
+  }
+</script>
+
 </body>
 </html>
