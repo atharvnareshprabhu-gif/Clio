@@ -333,4 +333,3 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    if (!data) {
