@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
@@ -246,7 +246,7 @@ module.exports = async function handler(req, res) {
       `;
     }
 
-    const models = ["gemini-3.5-flash-lite", "gemini-4-hydrogen"];
+    const models = ["gemini-2.5-flash", "gemini-2.5-pro"];
     let data = null;
     let lastErrorStatus = 502;
 
@@ -274,14 +274,8 @@ module.exports = async function handler(req, res) {
           }
         };
 
-        if (model === "gemini-4-hydrogen") {
-          requestBody.generationConfig.thinkingConfig = {
-            thinkingLevel: "LOW"
-          };
-        }
-
         const response = await fetch(
-          `https://googleapis.com{model}:generateContent?key=${encodeURIComponent(apiKey)}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
           {
             method: "POST",
             headers: {
@@ -336,3 +330,33 @@ module.exports = async function handler(req, res) {
 
     if (!rawText) {
       console.error("Gemini returned empty text:", data);
+      return res.status(502).json({
+        error: "The AI returned an empty response. Please try again."
+      });
+    }
+
+    rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "").trim();
+
+    let results;
+    try {
+      results = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.error("Failed to parse AI JSON response:", rawText);
+      return res.status(502).json({
+        error: "Failed to parse AI output. Please try again."
+      });
+    }
+
+    if (!Array.isArray(results)) {
+      return res.status(502).json({
+        error: "Invalid AI response structure. Please try again."
+      });
+    }
+
+    return res.status(200).json({ results });
+
+  } catch (error) {
+    console.error("Serverless Error:", error);
+    return res.status(500).json({ error: "Something went wrong on the server." });
+  }
+}
