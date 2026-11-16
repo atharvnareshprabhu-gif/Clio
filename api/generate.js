@@ -36,8 +36,6 @@ export default async function handler(req, res) {
         ${antiRoboticRule}
         - Keep bios strictly under 150 characters with clean line breaks and minimal, relevant emojis.
         - Make each of the 3 options distinctly different in angle.
-
-        Return ONLY a valid JSON array of 3 strings. No markdown formatting, no numbering prefixes inside strings, no extra explanation.
       `;
     } else {
       prompt = `
@@ -47,13 +45,11 @@ export default async function handler(req, res) {
         ${antiRoboticRule}
         - Keep each hook punchy (1 to 2 short lines max) so it stops the scroll in the first 2 seconds.
         - Make each of the 3 options use a unique psychological angle (e.g., curiosity gap, relatable truth, bold take).
-
-        Return ONLY a valid JSON array of 3 strings. No markdown formatting, no numbering prefixes inside strings, no extra explanation.
       `;
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://googleapis.com{apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +57,12 @@ export default async function handler(req, res) {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: { 
             temperature: 0.9,
-            topP: 0.95
+            topP: 0.95,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "ARRAY",
+              items: { type: "STRING" }
+            }
           }
         })
       }
@@ -74,9 +75,12 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    let rawText = data.candidates[0].content.parts[0].text.trim();
-    rawText = rawText.replace(/```json|```/g, '').trim();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
+    if (!rawText) {
+      return res.status(502).json({ error: 'Empty response from AI' });
+    }
+
     const results = JSON.parse(rawText);
     return res.status(200).json({ results });
 
