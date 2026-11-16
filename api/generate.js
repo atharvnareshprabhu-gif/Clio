@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // This endpoint is designed for a frontend hosted on the same
   // Vercel deployment. Same-origin requests do not need CORS headers.
 
