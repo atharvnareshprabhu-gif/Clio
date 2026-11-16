@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VibeHook AI — Viral Hook & Bio Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    body {
+      background-color: #07070f;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.12), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.14), transparent 40%);
+      color: #f3f4f6;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.35); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+
+    .glass-panel {
+      background: rgba(15, 16, 28, 0.78);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(192, 132, 252, 0.16);
+      box-shadow: 0 0 30px rgba(88, 28, 135, 0.12);
+    }
+    .neon-glow-btn {
+      background: linear-gradient(135deg, #0284c7 0%, #7e22ce 55%, #a855f7 100%);
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+      transition: all 0.2s ease;
+    }
+    .neon-glow-btn:hover {
+      box-shadow: 0 0 26px rgba(56, 189, 248, 0.65);
+      transform: translateY(-1px);
+    }
+    .pill-active {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(168, 85, 247, 0.28));
+      border-color: #c084fc !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.25);
+    }
+  </style>
+</head>
+<body class="flex flex-col p-3 md:p-4 select-none">
+
+  <!-- Top Compact Navbar -->
+  <header class="flex items-center justify-between px-4 py-2.5 mb-3 rounded-xl glass-panel shrink-0">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-400 via-purple-500 to-fuchsia-400 flex items-center justify-center font-bold text-slate-950 text-sm shadow-lg shadow-purple-500/30">
+        ⚡
+      </div>
+      <div>
+        <h1 class="text-sm md:text-base font-bold tracking-tight bg-gradient-to-r from-sky-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">
+          VibeHook AI
+        </h1>
+        <p class="text-[10px] text-slate-400 hidden sm:block">Scroll-Stopping Hooks & High-Converting Bios</p>
+      </div>
+    </div>
+
+    <!-- Mode Switcher (Center) -->
+    <div class="flex bg-slate-950/80 p-1 rounded-lg border border-purple-500/20">
+      <button id="tab-hook" onclick="switchMode('hook')" class="px-3 py-1 rounded-md text-xs font-semibold transition-all pill-active border border-transparent">
+        🪝 Viral Hooks
+      </button>
+      <button id="tab-bio" onclick="switchMode('bio')" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition-all border border-transparent">
+        ✨ Bio Generator
+      </button>
+    </div>
+
+    <div class="w-8"></div>
+  </header>
+
+  <!-- Main Single-View Workspace (Zero Scroll) -->
+  <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
+
+    <!-- LEFT PANEL: Controls -->
+    <section class="lg:col-span-5 glass-panel rounded-xl p-4 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-3">
+        
+        <!-- Platform & Tone Row -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] font-medium text-purple-300 mb-1">Platform</label>
+            <select id="platform-select" class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-purple-300 mb-1">Vibe / Tone</label>
+            <select id="tone-select" class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg px-2.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-400">
+              <option value="Curiosity & Scroll-Stopping">🔥 Curiosity Gap</option>
+              <option value="Bold & Controversial">⚡ Bold / Unpopular Opinion</option>
+              <option value="Witty & Relatable">😎 Witty & Relatable</option>
+              <option value="Storytelling & Emotional">🎬 Storytelling</option>
+              <option value="Direct Value & Actionable">🎯 Direct Value</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Language Style Selector (Pills) -->
+        <div>
+          <label class="block text-[11px] font-medium text-purple-300 mb-1">Language Style</label>
+          <div class="grid grid-cols-3 gap-2" id="lang-group">
+            <button type="button" onclick="selectLang('Hinglish', this)" class="lang-btn pill-active py-1.5 px-2 rounded-lg text-[11px] font-medium border border-purple-500/20 text-slate-300 transition text-center">
+              🇮🇳 Hinglish
+            </button>
+            <button type="button" onclick="selectLang('Simple English', this)" class="lang-btn py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-950/70 border border-purple-500/20 text-slate-300 hover:border-purple-400/50 transition text-center">
+              💬 Simple Eng
+            </button>
+            <button type="button" onclick="selectLang('Professional English', this)" class="lang-btn py-1.5 px-2 rounded-lg text-[11px] font-medium bg-slate-950/70 border border-purple-500/20 text-slate-300 hover:border-purple-400/50 transition text-center">
+              💼 Pro English
+            </button>
+          </div>
+        </div>
+
+        <!-- Topic / Niche Input -->
+        <div>
+          <label id="input-label" class="block text-[11px] font-medium text-purple-300 mb-1">Video / Post Topic</label>
+          <textarea id="topic-input" rows="3" placeholder="e.g., How students can earn money using AI tools without coding..."
+            class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400 resize-none"></textarea>
+        </div>
+
+        <!-- Extra Context / Keywords -->
+        <div>
+          <label id="extra-label" class="block text-[11px] font-medium text-purple-300 mb-1">Target Audience / Keywords (Optional)</label>
+          <input id="extra-input" type="text" placeholder="e.g., College students, beginners, zero investment"
+            class="w-full bg-slate-950/90 border border-purple-500/25 rounded-lg px-2.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400" />
+        </div>
+
+      </div>
+
+      <!-- Generate CTA -->
+      <div class="pt-3 mt-2 border-t border-purple-500/15">
+        <button id="generate-btn" onclick="generateContent()" class="w-full neon-glow-btn py-2.5 rounded-xl font-semibold text-xs md:text-sm text-white flex items-center justify-center gap-2 cursor-pointer">
+          <span>✨ Generate 3 Viral Options</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Output Feed -->
+    <section class="lg:col-span-7 glass-panel rounded-xl p-4 flex flex-col min-h-0">
+      <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-purple-500/15 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          <h2 id="output-title" class="text-xs md:text-sm font-semibold text-slate-200">Generated Results</h2>
+        </div>
+        <button onclick="copyAll()" id="copy-all-btn" class="hidden text-[11px] px-2.5 py-1 rounded-md bg-sky-500/15 text-sky-300 border border-sky-400/30 hover:bg-sky-500/25 transition">
+          Copy All
+        </button>
+      </div>
+
+      <!-- Scrollable Results Container -->
+      <div id="results-container" class="flex-1 overflow-y-auto space-y-2.5 pr-1">
+        <div class="h-full flex flex-col items-center justify-center text-center px-6 opacity-60">
+          <p class="text-xs text-slate-400">
+            Topic likho aur <span class="text-sky-300 font-semibold">Generate</span> dabao! ✨
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 border border-sky-400/50 text-sky-200 px-3.5 py-2 rounded-lg text-xs font-medium shadow-lg shadow-sky-500/20 translate-y-16 opacity-0 transition-all duration-300 pointer-events-none z-50">
+    ✅ Copied to clipboard!
+  </div>
+
+  <script>
+    let currentMode = 'hook';
+    let selectedLang = 'Hinglish';
+    let generatedItems = [];
+
+    const platforms = {
+      hook: [
+        { value: 'Instagram Reels / YouTube Shorts', label: '📱 Reels / YT Shorts' },
+        { value: 'LinkedIn Post', label: '💼 LinkedIn Post' },
+        { value: 'Twitter / X Thread', label: '🐦 X (Twitter) Thread' },
+        { value: 'YouTube Long Video', label: '▶️ YouTube Intro' },
+        { value: 'WhatsApp / Cold Outreach', label: '💬 WhatsApp Hook' }
+      ],
+      bio: [
+        { value: 'Instagram Bio', label: '📸 Instagram Bio' },
+        { value: 'LinkedIn Headline & Short Bio', label: '💼 LinkedIn Headline' },
+        { value: 'Twitter / X Bio', label: '🐦 X (Twitter) Bio' },
+        { value: 'Bumble / Dating Profile Bio', label: '✨ Dating App Bio' },
+        { value: 'Portfolio / Freelancer Bio', label: '💻 Creator / Dev Bio' }
+      ]
+    };
+
+    window.onload = () => {
+      updatePlatformDropdown();
+    };
+
+    function switchMode(mode) {
+      currentMode = mode;
+      const tabHook = document.getElementById('tab-hook');
+      const tabBio = document.getElementById('tab-bio');
+      const inputLabel = document.getElementById('input-label');
+      const extraLabel = document.getElementById('extra-label');
+      const topicInput = document.getElementById('topic-input');
+      const extraInput = document.getElementById('extra-input');
+      const outputTitle = document.getElementById('output-title');
+
+      if (mode === 'hook') {
+        tabHook.classList.add('pill-active');
+        tabHook.classList.remove('text-slate-400');
+        tabBio.classList.remove('pill-active');
+        tabBio.classList.add('text-slate-400');
+
+        inputLabel.innerText = 'Video / Post Topic';
+        topicInput.placeholder = 'e.g., How students can earn money using AI tools without coding...';
+        extraLabel.innerText = 'Target Audience / Keywords (Optional)';
+        extraInput.placeholder = 'e.g., College students, beginners, Mumbai';
+        outputTitle.innerText = 'Generated Viral Hooks';
+      } else {
+        tabBio.classList.add('pill-active');
+        tabBio.classList.remove('text-slate-400');
+        tabHook.classList.remove('pill-active');
+        tabHook.classList.add('text-slate-400');
+
+        inputLabel.innerText = 'About You / Niche / Skills';
+        topicInput.placeholder = 'e.g., 21yo web developer & indie game builder from Mumbai, love coffee and storytelling...';
+        extraLabel.innerText = 'Call to Action / Achievement (Optional)';
+        extraInput.placeholder = 'e.g., Built 5 AI tools, DM for collabs';
+        outputTitle.innerText = 'Generated Profile Bios';
+      }
+      updatePlatformDropdown();
+    }
+
+    function updatePlatformDropdown() {
+      const select = document.getElementById('platform-select');
+      select.innerHTML = platforms[currentMode]
+        .map(p => `<option value="${p.value}">${p.label}</option>`)
+        .join('');
+    }
+
+    function selectLang(lang, btn) {
+      selectedLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.remove('pill-active');
+        b.classList.add('bg-slate-950/70');
+      });
+      btn.classList.add('pill-active');
+      btn.classList.remove('bg-slate-950/70');
+    }
+
+    async function generateContent() {
+      const topic = document.getElementById('topic-input').value.trim();
+      const extra = document.getElementById('extra-input').value.trim();
+      const platform = document.getElementById('platform-select').value;
+      const tone = document.getElementById('tone-select').value;
+
+      if (!topic) {
+        showToast('⚠️ Pehle topic ya niche likho bhai!');
+        document.getElementById('topic-input').focus();
+        return;
+      }
+
+      const btn = document.getElementById('generate-btn');
+      const container = document.getElementById('results-container');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin">⏳</span> Generating...`;
+
+      container.innerHTML = `
+        <div class="space-y-2.5 animate-pulse">
+          ${[1,2,3].map(() => `<div class="h-16 rounded-xl bg-slate-900/90 border border-purple-500/20"></div>`).join('')}
+        </div>
+      `;
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: currentMode,
+            topic,
+            extra,
+            platform,
+            tone,
+            language: selectedLang
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Server error');
+
+        generatedItems = data.results;
+        renderResults(data.results);
+
+      } catch (err) {
+        console.error(err);
+        showToast('❌ Error! Using backup templates.');
+        const fallback = generateDemoFallback(topic, extra);
+        generatedItems = fallback;
+        renderResults(fallback);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>✨ Generate 3 Viral Options</span>`;
+      }
+    }
+
+    function generateDemoFallback(topic, extra) {
+      if (currentMode === 'hook') {
+        if (selectedLang === 'Hinglish') {
+          return [
+            `Bhai, agar tum abhi bhi "${topic}" purane tareeke se kar rahe ho, toh yeh 30 seconds tumhara time bacha lenge.`,
+            `99% log "${topic}" mein ek hi galti karte hain — aur unhe pata bhi nahi chalta. Dekho kaise fix karna hai 👇`,
+            `Sach bolu? "${topic}" utna mushkil nahi hai jitna logon ne bana rakha hai. Bas yeh ek rule samajh lo.`
+          ];
+        } else {
+          return [
+            `Stop scrolling if you want to get better at ${topic} in the next 60 seconds.`,
+            `I tried every trick for ${topic}, and this simple habit is the only one that actually worked.`,
+            `Nobody talks about the hardest part of ${topic}—until you try doing it yourself.`
+          ];
+        }
+      } else {
+        if (selectedLang === 'Hinglish') {
+          return [
+            `🚀 ${topic}\n💡 Sapne bade, execution usse bhi fast\n👇 ${extra || 'Naya kuch build ho raha hai!'}`,
+            `Building cool stuff around ${topic} ⚡\nChai + Code + Late night ideas ☕`,
+            `✨ ${topic}\nSeedhi baat, zero fluff. Roz kuch naya seekh raha hoon.`
+          ];
+        } else {
+          return [
+            `✨ ${topic}\nMaking simple things that actually work.\n👇 ${extra || 'Check out my latest work'}`,
+            `Hey! I focus on ${topic}.\nSharing what I learn along the way 🚀`,
+            `${topic} 🌱\nBig fan of clean design, good stories, and late-night ideas.`
+          ];
+        }
+      }
+    }
+
+    function renderResults(items) {
+      const container = document.getElementById('results-container');
+      const copyAllBtn = document.getElementById('copy-all-btn');
+      copyAllBtn.classList.remove('hidden');
+
+      container.innerHTML = items.map((text, idx) => `
+        <div class="group relative bg-slate-950/85 hover:bg-slate-900/95 border border-purple-500/20 hover:border-sky-400/50 rounded-xl p-3 transition-all duration-200 flex items-start justify-between gap-3">
+          <div class="flex items-start gap-2.5">
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 mt-0.5 shrink-0">
+              #${idx + 1}
+            </span>
+            <p class="text-xs md:text-[13px] text-slate-100 leading-relaxed whitespace-pre-line select-text">${escapeHtml(text)}</p>
+          </div>
+          <button onclick="copySingle(${idx})" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-purple-400/25 hover:border-sky-400 text-[11px] font-medium text-sky-300 hover:text-white transition cursor-pointer">
+            Copy
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function copySingle(index) {
+      navigator.clipboard.writeText(generatedItems[index]);
+      showToast(`✅ Option #${index + 1} copied!`);
+    }
+
+    function copyAll() {
+      const allText = generatedItems.map((t, i) => `${i + 1}. ${t}`).join('\n\n');
+      navigator.clipboard.writeText(allText);
+      showToast('📋 All 3 options copied!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 2200);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[m]);
+    }
+  </script>
+</body>
+</html>
