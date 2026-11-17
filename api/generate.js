@@ -52,9 +52,10 @@ export default async function handler(req, res) {
       });
     }
 
-    if (topic.length > 500) {
+    // FIXED: Updated limit from 500 to 2000 to match frontend textarea
+    if (topic.length > 2000) {
       return res.status(400).json({
-        error: "Topic must be 500 characters or fewer."
+        error: "Topic must be 2000 characters or fewer."
       });
     }
 
@@ -246,7 +247,6 @@ export default async function handler(req, res) {
       `;
     }
 
-    // Active models: gemini-2.5-flash primary, gemini-2.5-flash-lite fallback
     const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
     let data = null;
     let lastErrorStatus = 502;
