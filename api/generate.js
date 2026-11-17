@@ -58,9 +58,9 @@ export default async function handler(req, res) {
       });
     }
 
-    if (typeof extra !== "string" || extra.length > 500) {
+    if (typeof extra !== "string" || extra.length > 300) {
       return res.status(400).json({
-        error: "Extra context must be 500 characters or fewer."
+        error: "Extra context must be 300 characters or fewer."
       });
     }
 
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
         "Write in natural Indian Hinglish using Roman script. Mix Hindi and English smoothly, like a real Indian creator. Avoid awkward literal translations."
     };
 
-    if (!Object.hasOwn(languageRules, language)) {
+    if (!Object.prototype.hasOwnProperty.call(languageRules, language)) {
       return res.status(400).json({
         error: "Please select a valid language."
       });
@@ -246,13 +246,14 @@ export default async function handler(req, res) {
       `;
     }
 
-    const models = ["gemini-2.5-flash", "gemini-2.5-pro"];
+    // Active models: gemini-2.5-flash primary, gemini-2.5-flash-lite fallback
+    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
     let data = null;
     let lastErrorStatus = 502;
 
     for (const model of models) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 20000);
+      const timeout = setTimeout(() => controller.abort(), 8000);
 
       try {
         const requestBody = {
@@ -265,7 +266,7 @@ export default async function handler(req, res) {
           generationConfig: {
             temperature: 0.85,
             topP: 0.9,
-            maxOutputTokens: 1200,
+            maxOutputTokens: 2048,
             responseMimeType: "application/json",
             responseSchema: {
               type: "ARRAY",
@@ -300,6 +301,10 @@ export default async function handler(req, res) {
         } else {
           break;
         }
+      } catch (err) {
+        console.warn(`Model ${model} network/timeout error:`, err.message);
+        lastErrorStatus = 504;
+        continue;
       } finally {
         clearTimeout(timeout);
       }
@@ -335,28 +340,41 @@ export default async function handler(req, res) {
       });
     }
 
-    rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "").trim();
+    if (rawText.startsWith("```json")) {
+      rawText = rawText.replace(/^```json/, "").replace(/```$/, "").trim();
+    } else if (rawText.startsWith("```")) {
+      rawText = rawText.replace(/^```/, "").replace(/```$/, "").trim();
+    }
 
     let results;
     try {
       results = JSON.parse(rawText);
-    } catch (parseErr) {
-      console.error("Failed to parse AI JSON response:", rawText);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini JSON output:", rawText);
       return res.status(502).json({
-        error: "Failed to parse AI output. Please try again."
+        error: "Failed to format AI response. Please try again."
       });
     }
 
-    if (!Array.isArray(results)) {
+    if (!Array.isArray(results) || results.length === 0) {
       return res.status(502).json({
-        error: "Invalid AI response structure. Please try again."
+        error: "AI did not return valid options. Please try again."
       });
     }
 
-    return res.status(200).json({ results });
+    const cleanResults = results
+      .filter((item) => typeof item === "string" && item.trim().length > 0)
+      .map((item) => item.trim())
+      .slice(0, 3);
+
+    return res.status(200).json({
+      results: cleanResults
+    });
 
   } catch (error) {
-    console.error("Serverless Error:", error);
-    return res.status(500).json({ error: "Something went wrong on the server." });
+    console.error("Unexpected server error:", error);
+    return res.status(500).json({
+      error: "Something went wrong on the server. Please try again."
+    });
   }
 }
