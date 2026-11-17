@@ -1,10 +1,8 @@
 export default async function handler(req, res) {
-  // CORS Preflight handling
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  // Method check
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST, OPTIONS");
     return res.status(405).json({
@@ -12,19 +10,16 @@ export default async function handler(req, res) {
     });
   }
 
-  // Environment API Keys
-  const groqApiKey = process.env.GROQ_API_KEY;
-  const geminiApiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
 
-  if (!groqApiKey && !geminiApiKey) {
-    console.error("Missing both GROQ_API_KEY and GEMINI_API_KEY environment variables.");
+  if (!apiKey) {
+    console.error("Missing GROQ_API_KEY environment variable.");
     return res.status(500).json({
       error: "Configuration error. Please try again later."
     });
   }
 
   try {
-    // Parse request body safely
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body)
@@ -45,14 +40,12 @@ export default async function handler(req, res) {
       language
     } = body;
 
-    // Validate generation mode
     if (!["hook", "bio"].includes(mode)) {
       return res.status(400).json({
         error: "Please select a valid generation mode."
       });
     }
 
-    // Validate topic string
     if (typeof topic !== "string" || !topic.trim()) {
       return res.status(400).json({
         error: "Please enter a topic."
@@ -65,14 +58,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // Validate extra context
     if (typeof extra !== "string" || extra.length > 300) {
       return res.status(400).json({
         error: "Extra context must be 300 characters or fewer."
       });
     }
 
-    // Platform definitions
     const hookPlatforms = [
       "Instagram Reels/YouTube Shorts",
       "LinkedIn Post",
@@ -98,7 +89,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Tone definitions
     const allowedTones = [
       "Curiosity & Scroll-Stopping",
       "Bold & Controversial",
@@ -113,7 +103,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Language mapping rules
     const languageRules = {
       "Simple English":
         "Write in clear, natural, everyday conversational English. Avoid textbook language and corporate jargon.",
@@ -131,7 +120,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Detailed platform requirements
     const platformRules = {
       "Instagram Reels/YouTube Shorts":
         "Create a spoken opening line that grabs attention immediately. Make it natural to say aloud. Avoid long sentences.",
@@ -167,7 +155,6 @@ export default async function handler(req, res) {
     const safeTopic = JSON.stringify(topic.trim());
     const safeExtra = JSON.stringify(extra.trim() || "None");
 
-    // Common writing rules block
     const commonRules = `
       WRITING QUALITY RULES:
       - Generate exactly 3 distinct options.
@@ -183,169 +170,80 @@ export default async function handler(req, res) {
         }
     `;
 
-    // Constructing the final prompt based on mode
-    let prompt = "";
+    let prompt;
 
     if (mode === "bio") {
-      prompt = `
-        You are an expert social media profile copywriter.
-        TASK: Create 3 different profile bio options.
-        PLATFORM: ${platform}
-        PLATFORM REQUIREMENTS: ${platformRules[platform]}
-        USER TOPIC: ${safeTopic}
-        EXTRA CONTEXT: ${safeExtra}
-        SELECTED TONE: ${tone}
-        LANGUAGE: ${languageRules[language]}
-        ${commonRules}
-      `;
+      prompt = `You are an expert social media profile copywriter.
+      TASK: Create 3 different profile bio options.
+      PLATFORM: ${platform}
+      PLATFORM REQUIREMENTS: ${platformRules[platform]}
+      USER TOPIC: ${safeTopic}
+      EXTRA CONTEXT: ${safeExtra}
+      SELECTED TONE: ${tone}
+      LANGUAGE: ${languageRules[language]}
+      ${commonRules}`;
     } else {
-      prompt = `
-        You are an expert social media hook writer.
-        TASK: Create 3 different opening hooks.
-        PLATFORM: ${platform}
-        PLATFORM REQUIREMENTS: ${platformRules[platform]}
-        USER TOPIC: ${safeTopic}
-        TARGET AUDIENCE / KEYWORDS: ${safeExtra}
-        SELECTED TONE: ${tone}
-        LANGUAGE: ${languageRules[language]}
-        ${commonRules}
-      `;
+      prompt = `You are an expert social media hook writer.
+      TASK: Create 3 different opening hooks.
+      PLATFORM: ${platform}
+      PLATFORM REQUIREMENTS: ${platformRules[platform]}
+      USER TOPIC: ${safeTopic}
+      TARGET AUDIENCE / KEYWORDS: ${safeExtra}
+      SELECTED TONE: ${tone}
+      LANGUAGE: ${languageRules[language]}
+      ${commonRules}`;
     }
 
-    let rawText = null;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
-    // --- STEP 1: PRIMARY ENGINE (GROQ USING OPENAI OSS MODEL) ---
-    if (groqApiKey) {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: "openai/gpt-oss-120b",
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.85,
+        response_format: { type: "json_object" }
+      })
+    });
 
-        const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${groqApiKey}`
-          },
-          signal: controller.signal,
-          body: JSON.stringify({
-            model: "openai/gpt-oss-120b",
-            messages: [
-              {
-                role: "user",
-                content: prompt
-              }
-            ],
-            temperature: 0.85,
-            response_format: {
-              type: "json_object"
-            }
-          })
-        });
+    clearTimeout(timeout);
 
-        clearTimeout(timeout);
-
-        if (groqResponse.ok) {
-          const groqData = await groqResponse.json();
-          rawText = groqData.choices?.[0]?.message?.content?.trim() || null;
-          console.log("Successfully generated response using Groq primary engine.");
-        } else {
-          const errorBodyText = await groqResponse.text();
-          console.warn(`Groq request failed with HTTP status ${groqResponse.status}:`, errorBodyText.slice(0, 200));
-        }
-      } catch (groqError) {
-        console.warn("Groq network or timeout failure, attempting fallback to Gemini...", groqError.message);
-      }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Groq API failed:", errorText);
+      return res.status(502).json({
+        error: "Unable to generate content right now. Please try again in a moment."
+      });
     }
 
-    // --- STEP 2: FALLBACK ENGINE (GEMINI 3.8 FLASH) ---
-    if (!rawText && geminiApiKey) {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 9000);
+    const data = await response.json();
+    const rawText = data.choices?.[0]?.message?.content?.trim();
 
-        const geminiResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(geminiApiKey)}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            signal: controller.signal,
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: "user",
-                  parts: [
-                    {
-                      text: prompt
-                    }
-                  ]
-                }
-              ],
-              generationConfig: {
-                temperature: 0.85,
-                topP: 0.9,
-                maxOutputTokens: 2048,
-                responseMimeType: "application/json",
-                responseSchema: {
-                  type: "OBJECT",
-                  properties: {
-                    results: {
-                      type: "ARRAY",
-                      items: {
-                        type: "STRING"
-                      },
-                      description: "Array of exactly 3 generated options."
-                    }
-                  },
-                  required: ["results"]
-                }
-              }
-            })
-          }
-        );
-
-        clearTimeout(timeout);
-
-        if (geminiResponse.ok) {
-          const geminiData = await geminiResponse.json();
-          const candidate = geminiData.candidates && geminiData.candidates[0];
-          rawText = candidate?.content?.parts?.map((part) => part.text || "").join("").trim() || null;
-          console.log("Successfully generated response using Gemini fallback engine.");
-        } else {
-          const geminiErrorText = await geminiResponse.text();
-          console.error("Gemini fallback engine also failed:", geminiErrorText.slice(0, 200));
-        }
-      } catch (geminiError) {
-        console.error("Gemini fallback network or timeout failure:", geminiError.message);
-      }
-    }
-
-    // Final safety check if both failed
     if (!rawText) {
       return res.status(502).json({
         error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
-    // --- PARSE AND SANITIZE RESULTS ---
-    let parsedData = null;
+    let parsedData;
     try {
-      let cleanJsonText = rawText;
-      if (cleanJsonText.startsWith("```json")) {
-        cleanJsonText = cleanJsonText.replace(/^```json/, "").replace(/```$/, "").trim();
-      } else if (cleanJsonText.startsWith("```")) {
-        cleanJsonText = cleanJsonText.replace(/^```/, "").replace(/```$/, "").trim();
-      }
-      parsedData = JSON.parse(cleanJsonText);
+      parsedData = JSON.parse(rawText);
     } catch (parseError) {
-      console.error("Failed to parse JSON response output:", rawText);
+      console.error("Failed to parse Groq JSON output:", rawText);
       return res.status(502).json({
         error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
-    const results = parsedData && parsedData.results;
+    const results = parsedData.results;
 
     if (!Array.isArray(results) || results.length === 0) {
       return res.status(502).json({
@@ -363,7 +261,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Unexpected unhandled server error occurred:", error);
+    console.error("Unexpected server error:", error);
     return res.status(500).json({
       error: "Something went wrong. Please try again."
     });
