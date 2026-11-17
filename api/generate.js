@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (!apiKey) {
     console.error("Missing GEMINI_API_KEY environment variable.");
     return res.status(500).json({
-      error: "Server configuration error: GEMINI_API_KEY is missing."
+      error: "Configuration error. Please try again later."
     });
   }
 
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
     if (!body || typeof body !== "object" || Array.isArray(body)) {
       return res.status(400).json({
-        error: "Invalid request body."
+        error: "Invalid request format."
       });
     }
 
@@ -163,7 +163,7 @@ export default async function handler(req, res) {
       - Avoid generic filler and repetitive phrasing.
       - Do not invent qualifications, achievements, statistics,
         personal experiences, or facts not provided by the user.
-      - Avoid robotic AI clichés such as:
+      - Avoid robotic clichés such as:
         "unleash", "elevate", "delve", "unlock", "tapestry",
         "realm", "game-changer", "revolutionize", "skyrocket",
         and "embark".
@@ -246,15 +246,16 @@ export default async function handler(req, res) {
       `;
     }
 
-    // UPDATED ACTIVE MODELS MENTIONED IN ERROR RESPONSE
-    const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
+    const model = "gemini-3.8-flash";
     let data = null;
     let lastErrorStatus = 502;
-    let lastDetailedError = "";
 
-    for (const model of models) {
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // SILENT AUTO-RETRY LOOP (3 tries max)
+    for (let attempt = 1; attempt <= 3; attempt++) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      const timeout = setTimeout(() => controller.abort(), 9000);
 
       try {
         const requestBody = {
@@ -294,39 +295,38 @@ export default async function handler(req, res) {
         }
 
         lastErrorStatus = response.status;
-        lastDetailedError = await response.text();
-        console.warn(`Model ${model} failed (${response.status}):`, lastDetailedError.slice(0, 500));
+        const errorText = await response.text();
+        console.warn(`Attempt ${attempt} failed (${response.status}):`, errorText.slice(0, 200));
 
-        if (response.status === 429 || response.status === 503 || response.status === 404) {
+        if ((response.status === 503 || response.status === 429) && attempt < 3) {
+          await sleep(1500);
           continue;
         } else {
           break;
         }
       } catch (err) {
-        console.warn(`Model ${model} network/timeout error:`, err.message);
+        console.warn(`Attempt ${attempt} network error:`, err.message);
         lastErrorStatus = 504;
-        lastDetailedError = err.message;
-        continue;
+        if (attempt < 3) {
+          await sleep(1500);
+          continue;
+        }
       } finally {
         clearTimeout(timeout);
       }
     }
 
     if (!data) {
-      return res.status(lastErrorStatus === 429 ? 429 : 502).json({
-        error:
-          lastErrorStatus === 429
-            ? "Too many requests right now. Please wait a few seconds and try again."
-            : `AI generation failed (${lastErrorStatus}): ${lastDetailedError.slice(0, 100)}`
+      return res.status(502).json({
+        error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
     const candidate = data.candidates && data.candidates[0];
 
     if (!candidate) {
-      console.error("Gemini returned no candidate:", data);
       return res.status(502).json({
-        error: "The AI could not generate a response. Please try again."
+        error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
@@ -336,9 +336,8 @@ export default async function handler(req, res) {
       .trim();
 
     if (!rawText) {
-      console.error("Gemini returned empty text:", data);
       return res.status(502).json({
-        error: "The AI returned an empty response. Please try again."
+        error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
@@ -352,15 +351,14 @@ export default async function handler(req, res) {
     try {
       results = JSON.parse(rawText);
     } catch (parseError) {
-      console.error("Failed to parse Gemini JSON output:", rawText);
       return res.status(502).json({
-        error: "Failed to format AI response. Please try again."
+        error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
     if (!Array.isArray(results) || results.length === 0) {
       return res.status(502).json({
-        error: "AI did not return valid options. Please try again."
+        error: "Unable to generate content right now. Please try again in a moment."
       });
     }
 
@@ -376,7 +374,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Unexpected server error:", error);
     return res.status(500).json({
-      error: `Server error: ${error.message}`
+      error: "Something went wrong. Please try again."
     });
   }
 }
