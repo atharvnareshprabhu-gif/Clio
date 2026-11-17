@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (!apiKey) {
     console.error("Missing GEMINI_API_KEY environment variable.");
     return res.status(500).json({
-      error: "Server configuration error. Please try again later."
+      error: "Server configuration error: GEMINI_API_KEY is missing."
     });
   }
 
@@ -52,7 +52,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // FIXED: Updated limit from 500 to 2000 to match frontend textarea
     if (topic.length > 2000) {
       return res.status(400).json({
         error: "Topic must be 2000 characters or fewer."
@@ -247,9 +246,11 @@ export default async function handler(req, res) {
       `;
     }
 
-    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    // UPDATED ACTIVE MODELS MENTIONED IN ERROR RESPONSE
+    const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
     let data = null;
     let lastErrorStatus = 502;
+    let lastDetailedError = "";
 
     for (const model of models) {
       const controller = new AbortController();
@@ -293,8 +294,8 @@ export default async function handler(req, res) {
         }
 
         lastErrorStatus = response.status;
-        const errorText = await response.text();
-        console.warn(`Model ${model} failed (${response.status}):`, errorText.slice(0, 500));
+        lastDetailedError = await response.text();
+        console.warn(`Model ${model} failed (${response.status}):`, lastDetailedError.slice(0, 500));
 
         if (response.status === 429 || response.status === 503 || response.status === 404) {
           continue;
@@ -304,6 +305,7 @@ export default async function handler(req, res) {
       } catch (err) {
         console.warn(`Model ${model} network/timeout error:`, err.message);
         lastErrorStatus = 504;
+        lastDetailedError = err.message;
         continue;
       } finally {
         clearTimeout(timeout);
@@ -315,7 +317,7 @@ export default async function handler(req, res) {
         error:
           lastErrorStatus === 429
             ? "Too many requests right now. Please wait a few seconds and try again."
-            : "AI generation failed. Please try again."
+            : `AI generation failed (${lastErrorStatus}): ${lastDetailedError.slice(0, 100)}`
       });
     }
 
@@ -374,7 +376,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Unexpected server error:", error);
     return res.status(500).json({
-      error: "Something went wrong on the server. Please try again."
+      error: `Server error: ${error.message}`
     });
   }
 }
