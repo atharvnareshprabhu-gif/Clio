@@ -1,17 +1,6 @@
 {
-  "name": "vibehook-ai",
+  "name": "clio-hook-bio-generator",
   "version": "1.0.0",
-  "description": "Viral Hook & Bio Generator powered by Gemini AI",
-  "main": "index.html",
-  "engines": {
-    "node": ">=18.x"
-  },
-  "keywords": [
-    "ai",
-    "generator",
-    "hooks",
-    "bios"
-  ],
-  "author": "",
-  "license": "MIT"
+  "private": true,
+  "type": "module"
 }
