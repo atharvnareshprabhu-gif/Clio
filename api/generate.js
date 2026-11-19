@@ -1,3 +1,48 @@
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const MAX_REQUESTS_PER_WINDOW = 12; // Normal users won't hit this; bots/spammers will
+const DUPLICATE_COOLDOWN_MS = 15 * 1000; // 15s cooldown for exact repeated spam
+
+// In-memory tracking per warm serverless instance
+const ipHitsMap = new Map();
+const lastRequestMap = new Map();
+
+function getClientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string" && forwarded.trim()) {
+    return forwarded.split(",")[0].trim();
+  }
+  return req.socket?.remoteAddress || "unknown-ip";
+}
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = ipHitsMap.get(ip);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    ipHitsMap.set(ip, { windowStart: now, count: 1 });
+    return false;
+  }
+
+  entry.count += 1;
+  if (entry.count > MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+
+  return false;
+}
+
+function isRapidDuplicate(ip, payloadSignature) {
+  const now = Date.now();
+  const prev = lastRequestMap.get(ip);
+
+  if (prev && prev.sig === payloadSignature && now - prev.time < DUPLICATE_COOLDOWN_MS) {
+    return true;
+  }
+
+  lastRequestMap.set(ip, { sig: payloadSignature, time: now });
+  return false;
+}
+
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     return res.status(204).end();
@@ -10,10 +55,27 @@ export default async function handler(req, res) {
     });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  // Guard against huge payloads from bots/scripts
+  const contentLength = Number(req.headers["content-length"] || 0);
+  if (contentLength > 25000) {
+    return res.status(413).json({
+      error: "Request payload is too large."
+    });
+  }
 
-  if (!apiKey) {
-    console.error("Missing GROQ_API_KEY environment variable.");
+  const clientIp = getClientIp(req);
+
+  if (isRateLimited(clientIp)) {
+    return res.status(429).json({
+      error: "Too many requests in a short time. Please wait a minute and try again."
+    });
+  }
+
+  const groqApiKey = process.env.GROQ_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+
+  if (!groqApiKey && !geminiApiKey) {
+    console.error("Missing both GROQ_API_KEY and GEMINI_API_KEY environment variables.");
     return res.status(500).json({
       error: "Configuration error. Please try again later."
     });
@@ -120,6 +182,14 @@ export default async function handler(req, res) {
       });
     }
 
+    // Block identical back-to-back spam within 15s from the same IP
+    const signature = `${mode}|${topic.trim().toLowerCase()}|${extra.trim().toLowerCase()}|${platform}|${tone}|${language}`;
+    if (isRapidDuplicate(clientIp, signature)) {
+      return res.status(429).json({
+        error: "You just generated this exact request. Please wait a few seconds before repeating."
+      });
+    }
+
     const platformRules = {
       "Instagram Reels/YouTube Shorts":
         "Create a spoken opening line that grabs attention immediately. Make it natural to say aloud. Avoid long sentences.",
@@ -194,67 +264,121 @@ export default async function handler(req, res) {
       ${commonRules}`;
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    // Helper function to validate and clean JSON output from either AI
+    const extractCleanResults = (rawText) => {
+      if (!rawText) throw new Error("Empty response from AI provider.");
+      const parsed = JSON.parse(rawText);
+      if (!Array.isArray(parsed.results) || parsed.results.length === 0) {
+        throw new Error("Invalid JSON structure from AI provider.");
+      }
+      const clean = parsed.results
+        .filter((item) => typeof item === "string" && item.trim().length > 0)
+        .map((item) => item.trim())
+        .slice(0, 3);
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.85,
-        response_format: { type: "json_object" }
-      })
-    });
+      if (clean.length === 0) {
+        throw new Error("No valid strings in results array.");
+      }
+      return clean;
+    };
 
-    clearTimeout(timeout);
+    // 1. PRIMARY ENGINE: GROQ (openai/gpt-oss-120b)
+    async function callGroq() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Groq API failed:", errorText);
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${groqApiKey}`
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: "openai/gpt-oss-120b",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.85,
+            response_format: { type: "json_object" }
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Groq HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        const rawText = data.choices?.[0]?.message?.content?.trim();
+        return extractCleanResults(rawText);
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    // 2. BACKUP ENGINE: GEMINI (gemini-3.8-flash)
+    async function callGemini() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${geminiApiKey}`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [{ text: prompt }]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.85,
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Gemini HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        return extractCleanResults(rawText);
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    // EXECUTION WITH AUTOMATIC FAILOVER
+    let cleanResults = null;
+
+    if (groqApiKey) {
+      try {
+        cleanResults = await callGroq();
+      } catch (groqError) {
+        console.warn("Groq failed, triggering Gemini fallback:", groqError.message);
+      }
+    }
+
+    if (!cleanResults && geminiApiKey) {
+      try {
+        cleanResults = await callGemini();
+      } catch (geminiError) {
+        console.error("Gemini fallback also failed:", geminiError.message);
+      }
+    }
+
+    if (!cleanResults) {
       return res.status(502).json({
         error: "Unable to generate content right now. Please try again in a moment."
       });
     }
-
-    const data = await response.json();
-    const rawText = data.choices?.[0]?.message?.content?.trim();
-
-    if (!rawText) {
-      return res.status(502).json({
-        error: "Unable to generate content right now. Please try again in a moment."
-      });
-    }
-
-    let parsedData;
-    try {
-      parsedData = JSON.parse(rawText);
-    } catch (parseError) {
-      console.error("Failed to parse Groq JSON output:", rawText);
-      return res.status(502).json({
-        error: "Unable to generate content right now. Please try again in a moment."
-      });
-    }
-
-    const results = parsedData.results;
-
-    if (!Array.isArray(results) || results.length === 0) {
-      return res.status(502).json({
-        error: "Unable to generate content right now. Please try again in a moment."
-      });
-    }
-
-    const cleanResults = results
-      .filter((item) => typeof item === "string" && item.trim().length > 0)
-      .map((item) => item.trim())
-      .slice(0, 3);
 
     return res.status(200).json({
       results: cleanResults
