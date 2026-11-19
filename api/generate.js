@@ -67,7 +67,7 @@ export default async function handler(req, res) {
 
   if (isRateLimited(clientIp)) {
     return res.status(429).json({
-      error: "Too many requests in a short time. Please wait a minute and try again."
+      error: "Oops, sorry about that! Please be a little patient for the next response."
     });
   }
 
@@ -186,7 +186,7 @@ export default async function handler(req, res) {
     const signature = `${mode}|${topic.trim().toLowerCase()}|${extra.trim().toLowerCase()}|${platform}|${tone}|${language}`;
     if (isRapidDuplicate(clientIp, signature)) {
       return res.status(429).json({
-        error: "You just generated this exact request. Please wait a few seconds before repeating."
+        error: "Oops, sorry about that! Please be a little patient for the next response."
       });
     }
 
