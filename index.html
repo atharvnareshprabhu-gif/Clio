@@ -3,9 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#07070f" />
+  <meta name="theme-color" content="#080817" />
   <meta name="google-site-verification" content="Z1akx3g9CIbuj3ognXklxnWShCnYec_mVSPs7wsXk4s" />
-  <title>Clio — Hook & Bio Studio</title>
+
+  <!-- Primary SEO Meta Tags -->
+  <title>Clio — Free Shorts Hook Generator (Hinglish & English)</title>
+  <meta name="description" content="Generate scroll-stopping hooks for Reels, Shorts, and short-form videos in seconds. Free AI hook maker in Hinglish, Simple English, and Pro English." />
+  <meta name="keywords" content="shorts hook generator, reels hook generator, viral hook maker, hinglish hook generator, short video intro generator, video hook writer" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://YOUR-DOMAIN.vercel.app/" />
+
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Clio — Free Shorts Hook Generator" />
+  <meta property="og:description" content="Create viral opening lines for Reels and Shorts in Hinglish & English. Stop the scroll in the first 3 seconds." />
+  <meta property="og:url" content="https://YOUR-DOMAIN.vercel.app/" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Clio — Viral Shorts Hook Generator" />
+  <meta name="twitter:description" content="Generate catchy video hooks for Reels and Shorts in Hinglish and English." />
+
+  <!-- Structured Data (WebApplication + FAQ Schema for Google Rich Results) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Clio Shorts Hook Generator",
+        "url": "https://YOUR-DOMAIN.vercel.app/",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "All",
+        "description": "Free online tool to generate viral hooks for Reels and Shorts in Hinglish and English.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a video hook in short-form videos and Shorts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A video hook is the opening line or first 3 seconds of your Short or Reel designed to grab viewer attention, spark curiosity, and stop them from scrolling past."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I generate hooks in Hinglish?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Clio supports Hinglish, Simple English, and Professional English so Indian creators can generate natural, relatable opening lines for their audience."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Clio Shorts Hook Generator free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, Clio is completely free to use with no login required. Enter your video topic, pick your format and vibe, and get 3 ready-to-use hooks instantly."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,10 +95,13 @@
       min-height: 100vh;
       min-height: 100dvh;
       margin: 0;
-      background-color: #07070f;
+      background-color: #080817;
       background-image:
-        radial-gradient(circle at 15% 15%, rgba(56,189,248,.12), transparent 35%),
-        radial-gradient(circle at 85% 80%, rgba(168,85,247,.14), transparent 40%);
+        radial-gradient(ellipse at 8% 8%, rgba(14, 165, 233, .24), transparent 34%),
+        radial-gradient(ellipse at 92% 12%, rgba(168, 85, 247, .25), transparent 36%),
+        radial-gradient(ellipse at 78% 92%, rgba(217, 70, 239, .16), transparent 34%),
+        linear-gradient(135deg, #080817 0%, #10102a 48%, #090b1b 100%);
+      background-attachment: fixed;
       color: #f3f4f6;
       overflow-x: hidden;
     }
@@ -63,26 +134,21 @@
     }
 
     .glass-panel {
-      background: rgba(15,16,28,.82);
+      background: linear-gradient(145deg, rgba(23, 24, 48, .90), rgba(13, 15, 32, .88));
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(192,132,252,.16);
-      box-shadow: 0 0 30px rgba(88,28,135,.12);
+      border: 1px solid rgba(167, 139, 250, .25);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.045);
     }
 
     .neon-glow-btn {
-      background: linear-gradient(
-        135deg,
-        #0284c7 0%,
-        #7e22ce 55%,
-        #a855f7 100%
-      );
-      box-shadow: 0 0 18px rgba(168,85,247,.35);
+      background: linear-gradient(105deg, #06b6d4 0%, #6366f1 48%, #c026d3 100%);
+      box-shadow: 0 8px 26px rgba(124, 58, 237, .28), 0 0 24px rgba(34, 211, 238, .12);
       transition: .2s ease;
     }
 
     .neon-glow-btn:hover:not(:disabled) {
-      box-shadow: 0 0 25px rgba(56,189,248,.5);
+      box-shadow: 0 10px 32px rgba(168, 85, 247, .38), 0 0 28px rgba(34, 211, 238, .22);
       transform: translateY(-1px);
     }
 
@@ -92,14 +158,10 @@
     }
 
     .pill-active {
-      background: linear-gradient(
-        135deg,
-        rgba(56,189,248,.22),
-        rgba(168,85,247,.28)
-      ) !important;
-      border-color: #c084fc !important;
+      background: linear-gradient(120deg, rgba(6,182,212,.24), rgba(139,92,246,.32), rgba(217,70,239,.22)) !important;
+      border-color: rgba(196,181,253,.82) !important;
       color: white !important;
-      box-shadow: 0 0 12px rgba(192,132,252,.2);
+      box-shadow: 0 0 18px rgba(139,92,246,.18);
     }
 
     .field {
@@ -151,89 +213,6 @@
     .toast-visible {
       transform: translateY(0) !important;
       opacity: 1 !important;
-    }
-
-    @media (max-width: 640px) {
-      .glass-panel {
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
-
-      .main-workspace {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .control-panel {
-        min-height: auto;
-      }
-
-      .output-panel {
-        min-height: 350px;
-      }
-
-      .results-area {
-        min-height: 230px;
-        max-height: 65vh;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .brand-name {
-        font-size: 12px;
-      }
-
-      .mode-btn {
-        padding-left: 8px;
-        padding-right: 8px;
-        font-size: 10px;
-      }
-
-      .lang-btn {
-        font-size: 10px;
-        padding-left: 4px;
-        padding-right: 4px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        transition-duration: .01ms !important;
-        animation-duration: .01ms !important;
-      }
-    }
-
-    /* CLIO visual identity */
-    body {
-      background-color: #080817;
-      background-image:
-        radial-gradient(ellipse at 8% 8%, rgba(14, 165, 233, .24), transparent 34%),
-        radial-gradient(ellipse at 92% 12%, rgba(168, 85, 247, .25), transparent 36%),
-        radial-gradient(ellipse at 78% 92%, rgba(217, 70, 239, .16), transparent 34%),
-        linear-gradient(135deg, #080817 0%, #10102a 48%, #090b1b 100%);
-      background-attachment: fixed;
-    }
-
-    .glass-panel {
-      background: linear-gradient(145deg, rgba(23, 24, 48, .90), rgba(13, 15, 32, .88));
-      border: 1px solid rgba(167, 139, 250, .25);
-      box-shadow: 0 18px 55px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.045);
-    }
-
-    .neon-glow-btn {
-      background: linear-gradient(105deg, #06b6d4 0%, #6366f1 48%, #c026d3 100%);
-      box-shadow: 0 8px 26px rgba(124, 58, 237, .28), 0 0 24px rgba(34, 211, 238, .12);
-    }
-
-    .neon-glow-btn:hover:not(:disabled) {
-      box-shadow: 0 10px 32px rgba(168, 85, 247, .38), 0 0 28px rgba(34, 211, 238, .22);
-    }
-
-    .pill-active {
-      background: linear-gradient(120deg, rgba(6,182,212,.24), rgba(139,92,246,.32), rgba(217,70,239,.22)) !important;
-      border-color: rgba(196,181,253,.82) !important;
-      box-shadow: 0 0 18px rgba(139,92,246,.18);
     }
 
     .mobile-view-toggle {
@@ -307,76 +286,23 @@
       background: linear-gradient(105deg,#0891b2,#7c3aed,#c026d3);
     }
 
-    @media (min-width: 641px) {
-      html, body {
-        height: 100%;
-        overflow: hidden;
-      }
-
-      .app-shell {
-        height: calc(100dvh - 32px);
-      }
-
-      .main-workspace {
-        min-height: 0;
-      }
-
-      .control-panel, .output-panel {
-        min-height: 0;
-      }
-
-      .control-panel {
-        overflow: auto;
-      }
-
-      .output-panel {
-        overflow: hidden;
-      }
-
-      .results-area {
-        max-height: none;
-      }
-
-      footer {
-        padding-top: 8px !important;
-        padding-bottom: 4px !important;
-      }
+    details summary::-webkit-details-marker {
+      display: none;
     }
 
     @media (max-width: 640px) {
-      html, body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+      .glass-panel {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
 
       body {
-        padding: 8px !important;
-      }
-
-      .app-shell {
-        height: calc(100dvh - 16px);
-        min-height: 0 !important;
-        gap: 8px;
+        padding: 10px !important;
       }
 
       header {
-        margin-bottom: 0 !important;
-        padding: 9px 11px !important;
-      }
-
-      header .w-9 {
-        width: 34px;
-        height: 34px;
-      }
-
-      header .flex-wrap {
-        flex-wrap: nowrap;
-      }
-
-      header .mode-btn {
-        padding: 7px 10px;
-        font-size: 10px;
+        margin-bottom: 10px !important;
+        padding: 10px 12px !important;
       }
 
       .mobile-view-toggle {
@@ -384,24 +310,19 @@
         grid-template-columns: 1fr 1fr;
         gap: 6px;
         padding: 4px;
+        margin-bottom: 10px;
         border: 1px solid rgba(167,139,250,.16);
         background: rgba(8,10,25,.68);
         border-radius: 13px;
-        flex: 0 0 auto;
       }
 
       .main-workspace {
         display: block !important;
-        flex: 1 1 auto;
-        min-height: 0 !important;
-        overflow: hidden;
       }
 
       .control-panel, .output-panel {
-        height: 100%;
-        min-height: 0 !important;
-        padding: 13px !important;
-        overflow: auto;
+        min-height: 420px;
+        padding: 14px !important;
       }
 
       .output-panel {
@@ -415,153 +336,82 @@
       .main-workspace.show-results .output-panel {
         display: flex;
       }
+    }
 
-      .compact-form {
-        gap: 10px !important;
+    @media (max-width: 360px) {
+      .brand-name {
+        font-size: 13px;
       }
 
-      .control-panel h2 {
-        font-size: 13px !important;
-      }
-
-      .control-panel .text-\\[11px\\] {
-        font-size: 10px !important;
-      }
-
-      .control-panel .field {
-        padding-top: 9px !important;
-        padding-bottom: 9px !important;
-      }
-
-      #topic-input {
-        min-height: 68px !important;
-        max-height: 88px !important;
-        resize: none;
-      }
-
-      .generate-area {
-        margin-top: 10px !important;
-        padding-top: 10px !important;
-      }
-
-      #generate-btn {
-        padding-top: 12px !important;
-        padding-bottom: 12px !important;
-      }
-
-      .output-panel .results-area {
-        min-height: 0 !important;
-        max-height: none !important;
-      }
-
-      .output-panel .result-card {
-        padding: 11px !important;
-      }
-
-      .output-panel .result-card p {
-        font-size: 11px !important;
-      }
-
-      footer {
-        display: none;
+      .lang-btn {
+        font-size: 10px;
+        padding-left: 4px;
+        padding-right: 4px;
       }
     }
 
-    @media (max-height: 700px) and (max-width: 640px) {
-      .control-panel {
-        padding: 10px !important;
-      }
-
-      .compact-form {
-        gap: 7px !important;
-      }
-
-      #topic-input {
-        min-height: 54px !important;
-        max-height: 64px !important;
-      }
-
-      .control-panel .field {
-        padding-top: 7px !important;
-        padding-bottom: 7px !important;
-      }
-
-      .generate-area {
-        margin-top: 7px !important;
-        padding-top: 7px !important;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
       }
     }
   </style>
 </head>
 
-<body class="p-3 sm:p-4">
+<body class="p-3 sm:p-5">
 
-  <div class="app-shell max-w-[1500px] mx-auto min-h-[calc(100dvh-24px)] sm:min-h-[calc(100dvh-32px)] flex flex-col">
+  <div class="app-shell max-w-[1380px] mx-auto flex flex-col">
 
     <!-- NAVBAR -->
-    <header class="glass-panel rounded-2xl px-3 sm:px-5 py-3 mb-4 shrink-0">
+    <header class="glass-panel rounded-2xl px-4 sm:px-6 py-3.5 mb-4">
       <div class="flex flex-wrap items-center justify-between gap-3">
 
         <!-- BRAND -->
-        <div class="flex items-center gap-2.5 min-w-0">
+        <div class="flex items-center gap-3 min-w-0">
           <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-tr from-sky-400 via-purple-500 to-fuchsia-400 flex items-center justify-center text-slate-950 text-lg shadow-lg shadow-purple-500/30">
             ⚡
           </div>
 
           <div class="min-w-0">
-            <h1 class="brand-name text-base sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-sky-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">
-              Clio
+            <h1 class="brand-name text-sm sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-sky-300 via-purple-300 to-fuchsia-300 bg-clip-text text-transparent">
+              Clio — Shorts Hook Generator
             </h1>
-            <p class="text-[9px] sm:text-[10px] text-slate-400">
-              Create. Connect. Capture Attention.
+            <p class="text-[10px] sm:text-xs text-slate-400">
+              Generate scroll-stopping first-3-second video hooks in Hinglish &amp; English.
             </p>
           </div>
         </div>
 
-        <!-- MODE SWITCHER -->
-        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-purple-500/20 shrink-0">
-
-          <button
-            type="button"
-            id="tab-hook"
-            onclick="switchMode('hook')"
-            aria-pressed="true"
-            class="mode-btn pill-active border border-transparent px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold transition-all">
-            🪝 Hooks
-          </button>
-
-          <button
-            type="button"
-            id="tab-bio"
-            onclick="switchMode('bio')"
-            aria-pressed="false"
-            class="mode-btn border border-transparent px-3 sm:px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
-            ✨ Bios
-          </button>
-
+        <!-- BADGE -->
+        <div class="hidden sm:flex items-center gap-2 bg-slate-950/75 px-3 py-1.5 rounded-xl border border-purple-500/20 text-[11px] font-semibold text-purple-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>100% Free · No Login</span>
         </div>
+
       </div>
     </header>
 
     <!-- MOBILE WORKSPACE SWITCHER -->
     <div class="mobile-view-toggle" role="group" aria-label="Workspace view">
-      <button type="button" id="mobile-create-tab" class="mobile-view-btn active" onclick="setMobileView('create')">Create</button>
+      <button type="button" id="mobile-create-tab" class="mobile-view-btn active" onclick="setMobileView('create')">Create Hook</button>
       <button type="button" id="mobile-results-tab" class="mobile-view-btn" onclick="setMobileView('results')">Results</button>
     </div>
 
     <!-- MAIN WORKSPACE -->
-    <main class="main-workspace grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
+    <main class="main-workspace grid grid-cols-1 lg:grid-cols-12 gap-4">
 
       <!-- LEFT CONTROL PANEL -->
       <section id="control-panel" class="control-panel lg:col-span-5 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between min-w-0">
 
-        <div class="space-y-3 compact-form">
+        <div class="space-y-3.5">
 
           <!-- PANEL HEADING -->
           <div>
-            <h2 class="text-sm font-bold text-white">Create your content</h2>
+            <h2 class="text-sm font-bold text-white">Customize your video hook</h2>
             <p class="text-[11px] text-slate-400 mt-1">
-              Customize your output in a few simple steps.
+              Pick your short-form format, tone, and topic to craft 3 high-retention opening lines.
             </p>
           </div>
 
@@ -570,30 +420,32 @@
 
             <div class="min-w-0">
               <label for="platform-select" class="block text-[11px] font-semibold text-purple-300 mb-2">
-                Platform
+                Video Format
               </label>
 
               <select
                 id="platform-select"
                 class="field px-3 py-2.5 text-xs cursor-pointer">
+                <option value="YouTube Shorts">▶️ Shorts</option>
+                <option value="Instagram Reels">📱 Reels</option>
+                <option value="Instagram Reels & YouTube Shorts">🔥 Shorts + Reels (Universal)</option>
+                <option value="YouTube Long Video Intro">🎬 Long Video Intro</option>
               </select>
             </div>
 
             <div class="min-w-0">
               <label for="tone-select" class="block text-[11px] font-semibold text-purple-300 mb-2">
-                Vibe / Tone
+                Hook Style / Vibe
               </label>
 
               <select
                 id="tone-select"
                 class="field px-3 py-2.5 text-xs cursor-pointer">
-
                 <option value="Curiosity & Scroll-Stopping">🔥 Curiosity Gap</option>
                 <option value="Bold & Controversial">⚡ Bold / Unpopular Opinion</option>
-                <option value="Witty & Relatable">😎 Witty & Relatable</option>
-                <option value="Storytelling & Emotional">🎬 Storytelling</option>
-                <option value="Direct Value & Actionable">🎯 Direct Value</option>
-
+                <option value="Witty & Relatable">😎 Witty &amp; Relatable</option>
+                <option value="Storytelling & Emotional">🎬 Mini Storytelling</option>
+                <option value="Direct Value & Actionable">🎯 Direct Value / Mistake</option>
               </select>
             </div>
           </div>
@@ -636,8 +488,8 @@
           <!-- TOPIC INPUT -->
           <div>
             <div class="flex justify-between items-center mb-2 gap-2">
-              <label id="input-label" for="topic-input" class="text-[11px] font-semibold text-purple-300">
-                Video / Post Topic
+              <label for="topic-input" class="text-[11px] font-semibold text-purple-300">
+                Short / Video Topic
               </label>
 
               <span class="text-[9px] text-slate-500">
@@ -649,8 +501,8 @@
               id="topic-input"
               rows="3"
               maxlength="2000"
-              placeholder="e.g. How students can earn money using AI tools without coding..."
-              class="field p-3 text-xs leading-relaxed resize-y min-h-[72px] max-h-[110px]"></textarea>
+              placeholder="e.g. 3 free AI tools every college student should use before exams..."
+              class="field p-3 text-xs leading-relaxed resize-y min-h-[78px] max-h-[120px]"></textarea>
 
             <div class="flex justify-end mt-1">
               <span id="topic-counter" class="text-[9px] text-slate-500">0 / 2000</span>
@@ -659,7 +511,7 @@
 
           <!-- EXTRA INPUT -->
           <div>
-            <label id="extra-label" for="extra-input" class="block text-[11px] font-semibold text-purple-300 mb-2">
+            <label for="extra-input" class="block text-[11px] font-semibold text-purple-300 mb-2">
               Target Audience / Keywords (Optional)
             </label>
 
@@ -667,27 +519,25 @@
               id="extra-input"
               type="text"
               maxlength="300"
-              placeholder="e.g. College students, beginners, zero investment"
+              placeholder="e.g. College students, tech beginners, Indian creators"
               class="field px-3 py-3 text-xs" />
           </div>
 
         </div>
 
         <!-- GENERATE BUTTON -->
-        <div class="pt-3 mt-3 border-t border-purple-500/15 generate-area">
+        <div class="pt-4 mt-4 border-t border-purple-500/15">
 
           <button
             id="generate-btn"
             type="button"
             onclick="generateContent()"
             class="neon-glow-btn w-full py-3.5 rounded-xl font-bold text-xs sm:text-sm text-white flex items-center justify-center gap-2 cursor-pointer">
-
-            <span>✨ Generate 3 Options</span>
-
+            <span>✨ Generate 3 Viral Hooks</span>
           </button>
 
-          <p class="text-center text-[9px] text-slate-500 mt-2">
-            Make your next post worth stopping for.
+          <p class="text-center text-[10px] text-slate-500 mt-2">
+            Win the first 3 seconds before viewers swipe away.
           </p>
 
         </div>
@@ -695,7 +545,7 @@
       </section>
 
       <!-- RIGHT OUTPUT PANEL -->
-      <section id="output-panel" class="output-panel lg:col-span-7 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col min-w-0 min-h-0">
+      <section id="output-panel" class="output-panel lg:col-span-7 glass-panel rounded-2xl p-4 sm:p-5 flex flex-col min-w-0">
 
         <!-- OUTPUT HEADER -->
         <div class="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-purple-500/15 shrink-0">
@@ -704,12 +554,12 @@
             <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse shrink-0"></span>
 
             <div class="min-w-0">
-              <h2 id="output-title" class="text-sm font-bold text-slate-200">
+              <h2 class="text-sm font-bold text-slate-200">
                 Generated Viral Hooks
               </h2>
 
-              <p class="text-[9px] text-slate-500 mt-0.5">
-                Your generated content appears here.
+              <p class="text-[10px] text-slate-500 mt-0.5">
+                Copy any hook with one tap and use it as your opening line or on-screen text.
               </p>
             </div>
           </div>
@@ -729,21 +579,21 @@
           id="results-container"
           aria-live="polite"
           aria-busy="false"
-          class="results-area flex-1 min-h-[240px] overflow-y-auto space-y-3 pr-1">
+          class="results-area flex-1 min-h-[290px] overflow-y-auto space-y-3 pr-1">
 
           <!-- INITIAL EMPTY STATE -->
-          <div class="min-h-[250px] flex flex-col items-center justify-center text-center px-4">
+          <div class="min-h-[290px] flex flex-col items-center justify-center text-center px-4">
 
             <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500/15 to-purple-500/20 border border-purple-400/20 flex items-center justify-center text-2xl mb-4">
-              ✨
+              🎬
             </div>
 
             <h3 class="text-sm font-semibold text-slate-200">
-              Ready to create?
+              Ready to write your opening hook?
             </h3>
 
-            <p class="text-[11px] text-slate-400 mt-2 max-w-[260px] leading-relaxed">
-              Enter your topic, choose your preferences and generate your first set of content.
+            <p class="text-[11px] text-slate-400 mt-2 max-w-[290px] leading-relaxed">
+              Enter your Short or Reel topic on the left, select Hinglish or English, and generate 3 scroll-stopping hooks.
             </p>
 
           </div>
@@ -754,10 +604,88 @@
 
     </main>
 
+    <!-- SEO CONTENT & FAQ SECTION (Crawlable, Clean, Zero Clutter) -->
+    <section aria-label="About Clio Hook Generator and FAQs" class="mt-6 glass-panel rounded-2xl p-5 sm:p-6 space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-xl bg-slate-950/60 border border-purple-500/15 p-4">
+          <h2 class="text-xs sm:text-sm font-bold text-sky-300">Why the First 3 Seconds Matter</h2>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            On Shorts and Reels, viewers decide within 2–3 seconds whether to keep watching or swipe. A strong hook creates an instant curiosity gap or calls out a relatable problem so your retention graph stays high.
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-slate-950/60 border border-purple-500/15 p-4">
+          <h2 class="text-xs sm:text-sm font-bold text-purple-300">Built for Hinglish &amp; English Creators</h2>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Most hook tools only write stiff generic English. Clio lets you generate conversational <strong>Hinglish</strong>, crisp <strong>Simple English</strong>, or polished <strong>Professional English</strong> hooks tailored for Indian and global audiences.
+          </p>
+        </div>
+
+        <div class="rounded-xl bg-slate-950/60 border border-purple-500/15 p-4">
+          <h2 class="text-xs sm:text-sm font-bold text-fuchsia-300">How to Use Generated Hooks</h2>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Speak the hook clearly in the first line of your voiceover, place a 4–6 word version as bold on-screen text at 0:00, and deliver the promised payoff immediately so viewers watch till the end.
+          </p>
+        </div>
+      </div>
+
+      <!-- FAQS -->
+      <div class="border-t border-purple-500/15 pt-5">
+        <h2 class="text-sm sm:text-base font-bold text-white mb-3">Frequently Asked Questions</h2>
+
+        <div class="space-y-2.5">
+          <details class="rounded-xl bg-slate-950/65 border border-purple-500/15 p-3.5 group" open>
+            <summary class="text-xs sm:text-[13px] font-semibold text-slate-200 cursor-pointer flex items-center justify-between">
+              <span>What is a video hook in short-form videos and Shorts?</span>
+              <span class="text-purple-300 text-xs">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+              A video hook is the opening sentence or visual statement in the first 3 seconds of your short-form video. Its only job is to stop the viewer from scrolling and make them curious about what comes next.
+            </p>
+          </details>
+
+          <details class="rounded-xl bg-slate-950/65 border border-purple-500/15 p-3.5 group">
+            <summary class="text-xs sm:text-[13px] font-semibold text-slate-200 cursor-pointer flex items-center justify-between">
+              <span>Which hook style works best for educational or tech videos?</span>
+              <span class="text-purple-300 text-xs">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+              <strong>Curiosity Gap</strong> and <strong>Direct Value / Mistake</strong> hooks perform best for educational, finance, coding, and AI content—for example, pointing out a common mistake or revealing a shortcut immediately.
+            </p>
+          </details>
+
+          <details class="rounded-xl bg-slate-950/65 border border-purple-500/15 p-3.5 group">
+            <summary class="text-xs sm:text-[13px] font-semibold text-slate-200 cursor-pointer flex items-center justify-between">
+              <span>Can I use these hooks for Shorts and long-form intros?</span>
+              <span class="text-purple-300 text-xs">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+              Yes. Select <strong>Shorts</strong> or <strong>Long Video Intro</strong> from the Video Format dropdown to generate hooks paced specifically for your video length.
+            </p>
+          </details>
+
+          <details class="rounded-xl bg-slate-950/65 border border-purple-500/15 p-3.5 group">
+            <summary class="text-xs sm:text-[13px] font-semibold text-slate-200 cursor-pointer flex items-center justify-between">
+              <span>Is Clio free to use?</span>
+              <span class="text-purple-300 text-xs">+</span>
+            </summary>
+            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+              Yes, Clio is 100% free with no signup required. Enter your video topic, pick your preferred tone and language, and copy your hooks in one click.
+            </p>
+          </details>
+        </div>
+      </div>
+
+    </section>
+
     <!-- FOOTER -->
-    <footer class="text-center py-4 mt-3 shrink-0">
-      <p class="text-[9px] text-slate-500">
-        © 2026 Clio · Create content that connects.
+    <footer class="text-center py-5 mt-2 space-y-1">
+      <p class="text-[10px] text-slate-500">
+        © 2026 Clio · Free Shorts Hook Generator
+      </p>
+      <p class="text-[9px] text-slate-600">
+        Clio is an independent creator tool and is not affiliated with or endorsed by any video platform.
       </p>
     </footer>
 
@@ -773,28 +701,9 @@
   </div>
 
 <script>
-  let currentMode = 'hook';
   let selectedLang = 'Hinglish';
   let generatedItems = [];
   let toastTimer = null;
-
-  const platforms = {
-    hook: [
-      { value: 'Instagram Reels/YouTube Shorts', label: '📱 Reels / YT Shorts' },
-      { value: 'LinkedIn Post', label: '💼 LinkedIn Post' },
-      { value: 'Twitter/X Thread', label: '🐦 X (Twitter) Thread' },
-      { value: 'YouTube Long Video', label: '▶️ YouTube Intro' },
-      { value: 'WhatsApp/Cold Outreach', label: '💬 WhatsApp Hook' }
-    ],
-
-    bio: [
-      { value: 'Instagram Bio', label: '📸 Instagram Bio' },
-      { value: 'LinkedIn Headline & Short Bio', label: '💼 LinkedIn Headline' },
-      { value: 'Twitter/X Bio', label: '🐦 X (Twitter) Bio' },
-      { value: 'Bumble/Dating Profile Bio', label: '✨ Dating App Bio' },
-      { value: 'Portfolio/Freelancer Bio', label: '💻 Creator / Dev Bio' }
-    ]
-  };
 
   // Mobile workspace tabs
   function setMobileView(view) {
@@ -812,8 +721,6 @@
 
   // INITIALIZATION
   document.addEventListener('DOMContentLoaded', () => {
-    updatePlatformDropdown();
-
     const topicInput = document.getElementById('topic-input');
 
     topicInput.addEventListener('input', () => {
@@ -821,97 +728,6 @@
         `${topicInput.value.length} / 2000`;
     });
   });
-
-  // MODE SWITCHER
-  function switchMode(mode) {
-    if (mode !== 'hook' && mode !== 'bio') return;
-
-    currentMode = mode;
-
-    const tabHook = document.getElementById('tab-hook');
-    const tabBio = document.getElementById('tab-bio');
-
-    const inputLabel = document.getElementById('input-label');
-    const extraLabel = document.getElementById('extra-label');
-
-    const topicInput = document.getElementById('topic-input');
-    const extraInput = document.getElementById('extra-input');
-
-    const outputTitle = document.getElementById('output-title');
-
-    tabHook.classList.toggle('pill-active', mode === 'hook');
-    tabBio.classList.toggle('pill-active', mode === 'bio');
-
-    tabHook.classList.toggle('text-slate-400', mode !== 'hook');
-    tabBio.classList.toggle('text-slate-400', mode !== 'bio');
-
-    tabHook.setAttribute('aria-pressed', mode === 'hook');
-    tabBio.setAttribute('aria-pressed', mode === 'bio');
-
-    if (mode === 'hook') {
-      inputLabel.textContent = 'Video / Post Topic';
-
-      topicInput.placeholder =
-        'e.g. How students can earn money using AI tools without coding...';
-
-      extraLabel.textContent =
-        'Target Audience / Keywords (Optional)';
-
-      extraInput.placeholder =
-        'e.g. College students, beginners, Mumbai';
-
-      outputTitle.textContent = 'Generated Viral Hooks';
-
-    } else {
-      inputLabel.textContent = 'About You / Niche / Skills';
-
-      topicInput.placeholder =
-        'e.g. Web developer, AI enthusiast, content creator...';
-
-      extraLabel.textContent =
-        'Call to Action / Achievement (Optional)';
-
-      extraInput.placeholder =
-        'e.g. Built 5 AI tools, DM for collaborations';
-
-      outputTitle.textContent = 'Generated Profile Bios';
-    }
-
-    // Clear old results when switching modes
-    generatedItems = [];
-
-    document.getElementById('copy-all-btn').classList.add('hidden');
-
-    document.getElementById('results-container').innerHTML = `
-      <div class="min-h-[250px] flex flex-col items-center justify-center text-center px-4">
-        <div class="text-3xl mb-3">✨</div>
-        <h3 class="text-sm font-semibold text-slate-200">
-          Ready to create?
-        </h3>
-        <p class="text-[11px] text-slate-400 mt-2">
-          Enter your details and generate your content.
-        </p>
-      </div>
-    `;
-
-    updatePlatformDropdown();
-    updateGenerateButton();
-
-    if (window.matchMedia('(max-width: 640px)').matches) {
-      setMobileView('create');
-    }
-  }
-
-  // PLATFORM DROPDOWN
-  function updatePlatformDropdown() {
-    const select = document.getElementById('platform-select');
-
-    select.innerHTML = platforms[currentMode]
-      .map(platform =>
-        `<option value="${escapeHtml(platform.value)}">${escapeHtml(platform.label)}</option>`
-      )
-      .join('');
-  }
 
   // LANGUAGE SELECTOR
   function selectLang(lang, btn) {
@@ -928,15 +744,6 @@
     btn.setAttribute('aria-pressed', 'true');
   }
 
-  // BUTTON LABEL
-  function updateGenerateButton() {
-    const btn = document.getElementById('generate-btn');
-
-    btn.innerHTML = currentMode === 'hook'
-      ? '<span>✨ Generate 3 Hooks</span>'
-      : '<span>✨ Generate 3 Bios</span>';
-  }
-
   // GENERATE CONTENT
   async function generateContent() {
     const topic = document.getElementById('topic-input').value.trim();
@@ -946,7 +753,7 @@
     const tone = document.getElementById('tone-select').value;
 
     if (!topic) {
-      showToast('⚠️ Please enter your topic or niche.');
+      showToast('⚠️ Please enter your Short or video topic.');
       document.getElementById('topic-input').focus();
       return;
     }
@@ -958,7 +765,7 @@
 
     btn.innerHTML = `
       <span class="animate-spin">⏳</span>
-      <span>Generating...</span>
+      <span>Generating Hooks...</span>
     `;
 
     container.setAttribute('aria-busy', 'true');
@@ -974,14 +781,13 @@
     `;
 
     try {
-      // API request to Vercel backend
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          mode: currentMode,
+          mode: 'hook',
           topic,
           extra,
           platform,
@@ -1003,7 +809,7 @@
       }
 
       if (!data || !Array.isArray(data.results) || data.results.length === 0) {
-        throw new Error('No valid results received from server.');
+        throw new Error('No valid hooks received from server.');
       }
 
       generatedItems = data.results
@@ -1020,7 +826,7 @@
         setMobileView('results');
       }
 
-      showToast('✨ Content generated successfully!');
+      showToast('✨ 3 viral hooks generated!');
 
     } catch (err) {
       console.error('Generation error:', err);
@@ -1032,7 +838,7 @@
         <div class="error-state">
           <div class="error-icon">!</div>
           <h3>Generation failed</h3>
-          <p>${escapeHtml(err.message || 'Unable to generate content. Please try again.')}</p>
+          <p>${escapeHtml(err.message || 'Unable to generate hooks. Please try again.')}</p>
           <button type="button" class="retry-btn" onclick="generateContent()">Try again</button>
         </div>
       `;
@@ -1045,7 +851,7 @@
 
     } finally {
       btn.disabled = false;
-      updateGenerateButton();
+      btn.innerHTML = '<span>✨ Generate 3 Viral Hooks</span>';
       container.setAttribute('aria-busy', 'false');
     }
   }
@@ -1119,7 +925,6 @@
         return true;
       }
 
-      // Fallback for browsers without Clipboard API
       const textarea = document.createElement('textarea');
 
       textarea.value = text;
@@ -1151,14 +956,14 @@
     const success = await copyText(generatedItems[index]);
 
     if (success) {
-      showToast(`✅ Option #${index + 1} copied!`);
+      showToast(`✅ Hook #${index + 1} copied!`);
     }
   }
 
   // COPY ALL
   async function copyAll() {
     if (!generatedItems.length) {
-      showToast('No content available to copy.');
+      showToast('No hooks available to copy.');
       return;
     }
 
@@ -1169,7 +974,7 @@
     const success = await copyText(allText);
 
     if (success) {
-      showToast('📋 All options copied!');
+      showToast('📋 All 3 hooks copied!');
     }
   }
 
