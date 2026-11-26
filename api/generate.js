@@ -94,19 +94,12 @@ export default async function handler(req, res) {
     }
 
     const {
-      mode,
       topic,
       extra = "",
-      platform,
+      platform = "Instagram Reels & YouTube Shorts",
       tone,
       language
     } = body;
-
-    if (!["hook", "bio"].includes(mode)) {
-      return res.status(400).json({
-        error: "Please select a valid generation mode."
-      });
-    }
 
     if (typeof topic !== "string" || !topic.trim()) {
       return res.status(400).json({
@@ -126,28 +119,29 @@ export default async function handler(req, res) {
       });
     }
 
-    const hookPlatforms = [
-      "Instagram Reels/YouTube Shorts",
-      "LinkedIn Post",
-      "Twitter/X Thread",
-      "YouTube Long Video",
-      "WhatsApp/Cold Outreach"
-    ];
+    const hookPlatformRules = {
+      "Instagram Reels":
+        "Write a punchy opening hook for an Instagram Reel that stops scrolling in the first 2-3 seconds. Easy to speak aloud naturally and works well as short on-screen text.",
 
-    const bioPlatforms = [
-      "Instagram Bio",
-      "LinkedIn Headline & Short Bio",
-      "Twitter/X Bio",
-      "Bumble/Dating Profile Bio",
-      "Portfolio/Freelancer Bio"
-    ];
+      "YouTube Shorts":
+        "Write a crisp, high-retention opening hook for a YouTube Short. Hook the viewer immediately in the first 2-3 seconds without slow throat-clearing.",
 
-    const allowedPlatforms =
-      mode === "hook" ? hookPlatforms : bioPlatforms;
+      "Instagram Reels & YouTube Shorts":
+        "Write a high-retention opening hook that works smoothly for both Instagram Reels and YouTube Shorts in the first 2-3 seconds. Keep it spoken-friendly and sharp.",
 
-    if (!allowedPlatforms.includes(platform)) {
+      "Instagram Reels/YouTube Shorts":
+        "Write a high-retention opening hook that works smoothly for both Instagram Reels and YouTube Shorts in the first 2-3 seconds. Keep it spoken-friendly and sharp.",
+
+      "YouTube Video Intro":
+        "Write an engaging opening hook for a YouTube video. Set up the core payoff, spark curiosity quickly, and give viewers a clear reason to keep watching.",
+
+      "YouTube Long Video":
+        "Write an engaging opening hook for a longer YouTube video. Set up the core payoff, spark curiosity quickly, and give viewers a clear reason to keep watching."
+    };
+
+    if (!Object.prototype.hasOwnProperty.call(hookPlatformRules, platform)) {
       return res.status(400).json({
-        error: "Please select a valid platform."
+        error: "Please select a valid video format."
       });
     }
 
@@ -161,7 +155,7 @@ export default async function handler(req, res) {
 
     if (!allowedTones.includes(tone)) {
       return res.status(400).json({
-        error: "Please select a valid tone."
+        error: "Please select a valid hook style."
       });
     }
 
@@ -183,86 +177,36 @@ export default async function handler(req, res) {
     }
 
     // Block identical back-to-back spam within 15s from the same IP
-    const signature = `${mode}|${topic.trim().toLowerCase()}|${extra.trim().toLowerCase()}|${platform}|${tone}|${language}`;
+    const signature = `hook|${topic.trim().toLowerCase()}|${extra.trim().toLowerCase()}|${platform}|${tone}|${language}`;
     if (isRapidDuplicate(clientIp, signature)) {
       return res.status(429).json({
         error: "Oops, sorry about that! Please be a little patient for the next response."
       });
     }
 
-    const platformRules = {
-      "Instagram Reels/YouTube Shorts":
-        "Create a spoken opening line that grabs attention immediately. Make it natural to say aloud. Avoid long sentences.",
-
-      "LinkedIn Post":
-        "Create a strong professional opening that makes readers want to expand the post. Be specific and credible. Avoid engagement bait.",
-
-      "Twitter/X Thread":
-        "Create a concise first-post hook that creates curiosity and gives readers a reason to continue the thread.",
-
-      "YouTube Long Video":
-        "Create an opening hook for a longer video. Establish the topic, create curiosity, and give viewers a reason to stay.",
-
-      "WhatsApp/Cold Outreach":
-        "Create a natural, respectful opening message. Do not sound spammy, pushy, or overly promotional.",
-
-      "Instagram Bio":
-        "Write a clear Instagram bio. Keep each option within 150 characters, including spaces and emojis.",
-
-      "LinkedIn Headline & Short Bio":
-        "Write a professional LinkedIn headline and a short supporting bio. Make the person's role, value, or expertise clear. Keep each option concise and within 300 characters.",
-
-      "Twitter/X Bio":
-        "Write a distinctive X profile bio. Keep each option within 160 characters, including spaces and emojis.",
-
-      "Bumble/Dating Profile Bio":
-        "Write an authentic, appealing dating profile bio. Show personality and specificity without sounding cheesy. Keep each option within 300 characters.",
-
-      "Portfolio/Freelancer Bio":
-        "Write a concise portfolio or freelancer bio. Explain what the person does and the value they offer. Keep each option within 300 characters."
-    };
-
     const safeTopic = JSON.stringify(topic.trim());
     const safeExtra = JSON.stringify(extra.trim() || "None");
 
-    const commonRules = `
-      WRITING QUALITY RULES:
-      - Generate exactly 3 distinct options.
-      - Sound natural, specific, and human.
-      - Avoid generic filler and repetitive phrasing.
-      - Do not invent qualifications, achievements, statistics, or personal experiences not provided by the user.
-      - Avoid robotic clichés such as "unleash", "elevate", "delve", "unlock", "tapestry", "realm", "game-changer", "revolutionize", "skyrocket", and "embark".
-      - Follow the selected language and tone.
-      - Do not add labels such as Option 1 or Option 2 inside the generated text.
-      - CRITICAL: Return ONLY a valid JSON object in this exact structure:
-        {
-          "results": ["option 1 text", "option 2 text", "option 3 text"]
-        }
-    `;
+    const prompt = `You are an expert short-form video hook writer for Instagram Reels and YouTube Shorts.
+    TASK: Create 3 distinct opening hooks for a short-form video.
+    VIDEO FORMAT: ${platform}
+    FORMAT RULES: ${hookPlatformRules[platform]}
+    VIDEO TOPIC: ${safeTopic}
+    TARGET AUDIENCE / KEYWORDS: ${safeExtra}
+    HOOK STYLE / TONE: ${tone}
+    LANGUAGE: ${languageRules[language]}
 
-    let prompt;
-
-    if (mode === "bio") {
-      prompt = `You are an expert social media profile copywriter.
-      TASK: Create 3 different profile bio options.
-      PLATFORM: ${platform}
-      PLATFORM REQUIREMENTS: ${platformRules[platform]}
-      USER TOPIC: ${safeTopic}
-      EXTRA CONTEXT: ${safeExtra}
-      SELECTED TONE: ${tone}
-      LANGUAGE: ${languageRules[language]}
-      ${commonRules}`;
-    } else {
-      prompt = `You are an expert social media hook writer.
-      TASK: Create 3 different opening hooks.
-      PLATFORM: ${platform}
-      PLATFORM REQUIREMENTS: ${platformRules[platform]}
-      USER TOPIC: ${safeTopic}
-      TARGET AUDIENCE / KEYWORDS: ${safeExtra}
-      SELECTED TONE: ${tone}
-      LANGUAGE: ${languageRules[language]}
-      ${commonRules}`;
-    }
+    HOOK & WRITING QUALITY RULES:
+    - Generate exactly 3 distinct hooks with different angles.
+    - Each hook must work in the first 2-3 seconds and sound natural when spoken out loud.
+    - Keep sentences tight, clear, and easy to follow on mobile.
+    - Do not invent personal results, stats, achievements, or experiences not provided by the user.
+    - Avoid generic filler and robotic clichés such as "unleash", "elevate", "delve", "unlock", "tapestry", "realm", "game-changer", "revolutionize", "skyrocket", and "embark".
+    - Do not add labels such as "Hook 1:", "Option 1:", or quotes around the whole hook unless natural to the line.
+    - CRITICAL: Return ONLY a valid JSON object in this exact structure:
+      {
+        "results": ["hook 1 text", "hook 2 text", "hook 3 text"]
+      }`;
 
     // Helper function to validate and clean JSON output from either AI
     const extractCleanResults = (rawText) => {
@@ -376,7 +320,7 @@ export default async function handler(req, res) {
 
     if (!cleanResults) {
       return res.status(502).json({
-        error: "Unable to generate content right now. Please try again in a moment."
+        error: "Unable to generate hooks right now. Please try again in a moment."
       });
     }
 
